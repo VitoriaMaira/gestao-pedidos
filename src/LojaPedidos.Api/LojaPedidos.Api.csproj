@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <ProjectReference Include="..\LojaPedidos.Application\LojaPedidos.Application.csproj" />
+    <ProjectReference Include="..\LojaPedidos.Infrastructure\LojaPedidos.Infrastructure.csproj" />
+    <ProjectReference Include="..\LojaPedidos.ServiceDefaults\LojaPedidos.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <NoDefaultLaunchSettingsFile>True</NoDefaultLaunchSettingsFile>
+  </PropertyGroup>
+
+</Project>
