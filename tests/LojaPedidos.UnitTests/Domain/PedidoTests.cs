@@ -10,30 +10,31 @@ public sealed class PedidoTests
     public void Criar_DeveIniciarPedido_QuandoDadosForemValidos()
     {
         var comprador = CriarComprador();
-        var produto = CriarProduto();
+        var item = CriarItem();
 
-        var pedido = new Pedido(comprador, [produto]);
+        var pedido = new Pedido(comprador, [item]);
 
         Assert.NotEqual(Guid.Empty, pedido.Id);
         Assert.Equal(comprador.Id, pedido.CompradorId);
         Assert.Equal(StatusPedido.Iniciado, pedido.Status);
-        Assert.Single(pedido.Produtos);
+        Assert.Single(pedido.Itens);
+        Assert.Equal(399.80m, pedido.Total);
     }
 
     [Fact]
     public void Criar_DeveFalhar_QuandoCompradorNaoForInformado()
     {
-        var excecao = Assert.Throws<DomainException>(() => new Pedido(null!, [CriarProduto()]));
+        var excecao = Assert.Throws<DomainException>(() => new Pedido(null!, [CriarItem()]));
 
         Assert.Equal("O comprador é obrigatório.", excecao.Message);
     }
 
     [Fact]
-    public void Criar_DeveFalhar_QuandoNaoExistiremProdutos()
+    public void Criar_DeveFalhar_QuandoNaoExistiremItens()
     {
         var excecao = Assert.Throws<DomainException>(() => new Pedido(CriarComprador(), []));
 
-        Assert.Equal("O pedido deve possuir pelo menos um produto.", excecao.Message);
+        Assert.Equal("O pedido deve possuir pelo menos um item.", excecao.Message);
     }
 
     [Fact]
@@ -43,7 +44,7 @@ public sealed class PedidoTests
         pedido.Processar();
 
         var excecao = Assert.Throws<DomainException>(
-            () => pedido.Alterar(CriarComprador(), [CriarProduto()]));
+            () => pedido.Alterar(CriarComprador(), [CriarItem()]));
 
         Assert.Equal("Apenas pedidos não processados podem ser alterados.", excecao.Message);
     }
@@ -96,7 +97,7 @@ public sealed class PedidoTests
 
     private static Pedido CriarPedido()
     {
-        return new Pedido(CriarComprador(), [CriarProduto()]);
+        return new Pedido(CriarComprador(), [CriarItem()]);
     }
 
     private static Comprador CriarComprador()
@@ -107,5 +108,10 @@ public sealed class PedidoTests
     private static Produto CriarProduto()
     {
         return new Produto("Teclado", 199.90m);
+    }
+
+    private static ItemPedido CriarItem()
+    {
+        return new ItemPedido(CriarProduto(), 2);
     }
 }

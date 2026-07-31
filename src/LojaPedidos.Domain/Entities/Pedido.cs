@@ -6,17 +6,17 @@ namespace LojaPedidos.Domain.Entities;
 
 public sealed class Pedido : Entity
 {
-    private readonly List<Produto> _produtos = [];
+    private readonly List<ItemPedido> _itens = [];
 
     private Pedido()
     {
         Comprador = null!;
     }
 
-    public Pedido(Comprador comprador, IEnumerable<Produto> produtos)
+    public Pedido(Comprador comprador, IEnumerable<ItemPedido> itens)
     {
         Comprador = ValidarComprador(comprador);
-        AdicionarProdutos(produtos);
+        AdicionarItens(itens);
         Status = StatusPedido.Iniciado;
         CriadoEm = DateTimeOffset.UtcNow;
     }
@@ -25,7 +25,7 @@ public sealed class Pedido : Entity
 
     public Comprador Comprador { get; private set; }
 
-    public IReadOnlyCollection<Produto> Produtos => _produtos.AsReadOnly();
+    public IReadOnlyCollection<ItemPedido> Itens => _itens.AsReadOnly();
 
     public StatusPedido Status { get; private set; }
 
@@ -33,7 +33,9 @@ public sealed class Pedido : Entity
 
     public DateTimeOffset? AtualizadoEm { get; private set; }
 
-    public void Alterar(Comprador comprador, IEnumerable<Produto> produtos)
+    public decimal Total => _itens.Sum(item => item.Subtotal);
+
+    public void Alterar(Comprador comprador, IEnumerable<ItemPedido> itens)
     {
         if (Status != StatusPedido.Iniciado)
         {
@@ -41,8 +43,8 @@ public sealed class Pedido : Entity
         }
 
         Comprador = ValidarComprador(comprador);
-        _produtos.Clear();
-        AdicionarProdutos(produtos);
+        _itens.Clear();
+        AdicionarItens(itens);
         RegistrarAtualizacao();
     }
 
@@ -90,26 +92,36 @@ public sealed class Pedido : Entity
         return comprador;
     }
 
-    private void AdicionarProdutos(IEnumerable<Produto>? produtos)
+    private void AdicionarItens(IEnumerable<ItemPedido>? itens)
     {
-        if (produtos is null)
+        if (itens is null)
         {
-            throw new DomainException("O pedido deve possuir pelo menos um produto.");
+            throw new DomainException("O pedido deve possuir pelo menos um item.");
         }
 
-        var produtosInformados = produtos.ToList();
+        var itensInformados = itens.ToList();
 
-        if (produtosInformados.Count == 0)
+        if (itensInformados.Count == 0)
         {
-            throw new DomainException("O pedido deve possuir pelo menos um produto.");
+            throw new DomainException("O pedido deve possuir pelo menos um item.");
         }
 
-        if (produtosInformados.Any(produto => produto is null))
+        if (itensInformados.Any(item => item is null))
         {
-            throw new DomainException("O pedido não pode possuir um produto inválido.");
+            throw new DomainException("O pedido não pode possuir um item inválido.");
         }
 
-        _produtos.AddRange(produtosInformados);
+        if (itensInformados.GroupBy(item => item.ProdutoId).Any(grupo => grupo.Count() > 1))
+        {
+            throw new DomainException("O mesmo produto não pode ser adicionado mais de uma vez.");
+        }
+
+        foreach (var item in itensInformados)
+        {
+            item.VincularAoPedido(Id);
+        }
+
+        _itens.AddRange(itensInformados);
     }
 
     private void RegistrarAtualizacao()

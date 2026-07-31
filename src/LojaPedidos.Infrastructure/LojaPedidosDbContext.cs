@@ -12,6 +12,8 @@ public sealed class LojaPedidosDbContext(DbContextOptions<LojaPedidosDbContext> 
 
     public DbSet<Pedido> Pedidos => Set<Pedido>();
 
+    public DbSet<ItemPedido> ItensPedido => Set<ItemPedido>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(LojaPedidosDbContext).Assembly);
