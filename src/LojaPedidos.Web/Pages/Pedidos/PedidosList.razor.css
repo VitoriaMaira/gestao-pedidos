@@ -1,0 +1,136 @@
+﻿.page-header {
+    align-items: flex-start;
+    display: flex;
+    gap: 1.5rem;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.page-description,
+.empty-description,
+.summary-text {
+    color: var(--mud-palette-text-secondary);
+}
+
+.page-description {
+    margin-top: 0.5rem;
+}
+
+.filters-card,
+.content-card,
+.empty-state {
+    box-shadow: var(--lp-shadow-card);
+}
+
+.filters-card {
+    margin-bottom: 1.5rem;
+}
+
+.filter-actions {
+    align-items: center;
+    display: flex;
+    gap: 0.5rem;
+    min-height: 48px;
+}
+
+.content-card {
+    overflow: hidden;
+}
+
+.list-summary {
+    align-items: center;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem 0.75rem;
+}
+
+.page-size-select {
+    flex: 0 0 120px;
+}
+
+.order-code,
+.buyer-name,
+.total-value {
+    font-weight: 600;
+}
+
+.order-code {
+    color: var(--lp-primary);
+    cursor: help;
+    letter-spacing: 0.03em;
+}
+
+.total-value {
+    color: var(--lp-primary);
+    white-space: nowrap;
+}
+
+.pagination-area {
+    align-items: center;
+    border-top: 1px solid var(--lp-border);
+    display: flex;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.empty-state {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.empty-description {
+    margin-top: 0.5rem;
+}
+
+.error-content {
+    align-items: center;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    width: 100%;
+}
+
+@media (max-width: 960px) {
+    .filter-actions {
+        padding-top: 0;
+    }
+}
+
+@media (max-width: 600px) {
+    .page-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .page-header .mud-button-root {
+        align-self: flex-start;
+    }
+
+    .filter-actions,
+    .error-content,
+    .list-summary {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .filter-actions .mud-button-root {
+        flex: 1;
+    }
+
+    .page-size-select {
+        width: 100%;
+    }
+
+    .orders-table ::deep .mud-table-cell {
+        min-height: 42px;
+    }
+
+    .pagination-area {
+        overflow-x: auto;
+        justify-content: flex-start;
+    }
+}
+

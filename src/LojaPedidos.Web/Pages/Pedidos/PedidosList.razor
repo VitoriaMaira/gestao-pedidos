@@ -1,17 +1,192 @@
 ﻿@page "/pedidos"
+@using LojaPedidos.Web.Contracts.Pedidos
 
 <PageTitle>Pedidos</PageTitle>
 
-<MudText Typo="Typo.h1" HtmlTag="h1">Pedidos</MudText>
-<MudText Typo="Typo.body1" Style="color: var(--mud-palette-text-secondary);" Class="mt-2 mb-6">
-    Consulte e acompanhe os pedidos da loja.
-</MudText>
+<div class="page-header">
+    <div>
+        <MudText Typo="Typo.h1" HtmlTag="h1">Pedidos</MudText>
+        <MudText Typo="Typo.body1" Class="page-description">
+            Consulte e acompanhe os pedidos da loja.
+        </MudText>
+    </div>
 
-<MudPaper Class="pa-8 text-center" Elevation="0" Outlined="true">
-    <MudIcon Icon="@Icons.Material.Outlined.ReceiptLong" Size="Size.Large" Color="Color.Secondary" />
-    <MudText Typo="Typo.h4" Class="mt-3">Listagem de pedidos</MudText>
-    <MudText Typo="Typo.body1" Style="color: var(--mud-palette-text-secondary);" Class="mt-2">
-        A integração com a API será adicionada na próxima etapa.
-    </MudText>
+    <MudButton Href="/pedidos/novo"
+               Variant="Variant.Filled"
+               Color="Color.Secondary"
+               StartIcon="@Icons.Material.Outlined.Add">
+        Novo pedido
+    </MudButton>
+</div>
+
+<MudPaper Class="filters-card pa-5" Elevation="0" Outlined="true">
+    <MudText Typo="Typo.h6" HtmlTag="h2" Class="mb-4">Filtros</MudText>
+
+    <MudGrid Spacing="3">
+        <MudItem xs="12" md="5">
+            <MudTextField T="string"
+                          @bind-Value="_cpf"
+                          Label="CPF do comprador"
+                          Placeholder="Digite somente os números"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          Clearable="true"
+                          Immediate="true"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Outlined.Badge"
+                          OnKeyDown="TratarTeclaDoFiltroAsync" />
+        </MudItem>
+
+        <MudItem xs="12" md="4">
+            <MudSelect T="StatusPedido?"
+                       @bind-Value="_status"
+                       Label="Status do pedido"
+                       Variant="Variant.Outlined"
+                       Margin="Margin.Dense"
+                       Clearable="true"
+                       AdornmentIcon="@Icons.Material.Outlined.Flag">
+                @foreach (var status in Enum.GetValues<StatusPedido>())
+                {
+                    <MudSelectItem T="StatusPedido?" Value="@((StatusPedido?)status)">
+                        @status
+                    </MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+
+        <MudItem xs="12" md="3">
+            <div class="filter-actions">
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Outlined.Search"
+                           Disabled="_carregando"
+                           OnClick="AplicarFiltrosAsync">
+                    Buscar
+                </MudButton>
+                <MudButton Variant="Variant.Text"
+                           Color="Color.Primary"
+                           Disabled="_carregando || !TemFiltros"
+                           OnClick="LimparFiltrosAsync">
+                    Limpar
+                </MudButton>
+            </div>
+        </MudItem>
+    </MudGrid>
 </MudPaper>
 
+@if (_carregando)
+{
+    <MudPaper Class="content-card pa-5" Elevation="0" Outlined="true" aria-busy="true">
+        <MudSkeleton SkeletonType="SkeletonType.Text" Width="180px" Height="28px" />
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="260px" Class="mt-4" />
+    </MudPaper>
+}
+else if (_mensagemErro is not null)
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="content-card">
+        <div class="error-content">
+            <span>@_mensagemErro</span>
+            <MudButton Variant="Variant.Text"
+                       Color="Color.Error"
+                       StartIcon="@Icons.Material.Outlined.Refresh"
+                       OnClick="CarregarPedidosAsync">
+                Tentar novamente
+            </MudButton>
+        </div>
+    </MudAlert>
+}
+else if (_pedidos.Count == 0)
+{
+    <MudPaper Class="empty-state pa-8" Elevation="0" Outlined="true">
+        <MudIcon Icon="@Icons.Material.Outlined.ReceiptLong" Size="Size.Large" Color="Color.Secondary" />
+        <MudText Typo="Typo.h4" HtmlTag="h2" Class="mt-3">Nenhum pedido encontrado</MudText>
+        <MudText Typo="Typo.body1" Class="empty-description">
+            @(TemFiltros
+                ? "Não encontramos pedidos com os filtros informados."
+                : "Os pedidos cadastrados aparecerão aqui.")
+        </MudText>
+        @if (TemFiltros)
+        {
+            <MudButton Variant="Variant.Text"
+                       Color="Color.Primary"
+                       Class="mt-2"
+                       OnClick="LimparFiltrosAsync">
+                Limpar filtros
+            </MudButton>
+        }
+    </MudPaper>
+}
+else
+{
+    <MudPaper Class="content-card" Elevation="0" Outlined="true">
+        <div class="list-summary">
+            <div>
+                <MudText Typo="Typo.h6" HtmlTag="h2">Pedidos encontrados</MudText>
+                <MudText Typo="Typo.body2" Class="summary-text">@TextoDoResumo</MudText>
+            </div>
+
+            <MudSelect T="int"
+                       Value="_tamanhoPagina"
+                       ValueChanged="AlterarTamanhoPaginaAsync"
+                       Label="Por página"
+                       Variant="Variant.Outlined"
+                       Margin="Margin.Dense"
+                       Class="page-size-select">
+                <MudSelectItem T="int" Value="10">10</MudSelectItem>
+                <MudSelectItem T="int" Value="20">20</MudSelectItem>
+                <MudSelectItem T="int" Value="50">50</MudSelectItem>
+            </MudSelect>
+        </div>
+
+        <MudTable T="PedidoResponse"
+                  Items="_pedidos"
+                  Hover="true"
+                  Breakpoint="Breakpoint.Sm"
+                  Elevation="0"
+                  Class="orders-table">
+            <HeaderContent>
+                <MudTh>Pedido</MudTh>
+                <MudTh>Comprador</MudTh>
+                <MudTh>Data</MudTh>
+                <MudTh>Status</MudTh>
+                <MudTh>Itens</MudTh>
+                <MudTh Class="text-right">Total</MudTh>
+            </HeaderContent>
+            <RowTemplate Context="pedido">
+                <MudTd DataLabel="Pedido">
+                    <MudTooltip Text="@pedido.Id.ToString()">
+                        <span class="order-code">#@ObterCodigo(pedido.Id)</span>
+                    </MudTooltip>
+                </MudTd>
+                <MudTd DataLabel="Comprador">
+                    <span class="buyer-name">@pedido.Comprador</span>
+                </MudTd>
+                <MudTd DataLabel="Data">@FormatarData(pedido.CriadoEm)</MudTd>
+                <MudTd DataLabel="Status">
+                    <MudChip T="string"
+                             Size="Size.Small"
+                             Variant="Variant.Filled"
+                             Color="@ObterCorDoStatus(pedido.Status)">
+                        @pedido.Status.ToString()
+                    </MudChip>
+                </MudTd>
+                <MudTd DataLabel="Itens">@FormatarQuantidadeDeItens(pedido.Itens.Count)</MudTd>
+                <MudTd DataLabel="Total" Class="text-right total-value">
+                    @FormatarValor(pedido.Total)
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+
+        @if (TotalDePaginas > 1)
+        {
+            <div class="pagination-area">
+                <MudPagination Count="TotalDePaginas"
+                               Selected="_pagina"
+                               SelectedChanged="AlterarPaginaAsync"
+                               Color="Color.Primary"
+                               ShowFirstButton="true"
+                               ShowLastButton="true" />
+            </div>
+        }
+    </MudPaper>
+}
