@@ -1,9 +1,11 @@
+using LojaPedidos.Application;
 using LojaPedidos.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
+builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
