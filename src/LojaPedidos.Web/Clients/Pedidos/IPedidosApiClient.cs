@@ -16,4 +16,18 @@ public interface IPedidosApiClient
     Task<ApiResult<PedidoResponse>> ObterPorIdAsync(
         Guid id,
         CancellationToken cancellationToken = default);
+
+    Task<ApiResult<PedidoResponse>> AlterarAsync(
+        Guid id,
+        AlterarPedidoRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<ApiResult<AtualizarStatusPedidoResponse>> AtualizarStatusAsync(
+        Guid id,
+        AtualizarStatusPedidoRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<ApiResult<ExcluirPedidoResponse>> ExcluirAsync(
+        Guid id,
+        CancellationToken cancellationToken = default);
 }

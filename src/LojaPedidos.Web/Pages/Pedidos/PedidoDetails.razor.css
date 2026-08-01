@@ -6,9 +6,21 @@
     margin-bottom: 1.5rem;
 }
 
-.details-card,
-.items-card {
-    box-shadow: var(--lp-shadow-card);
+.details-actions,
+.edit-actions {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.edit-actions {
+    justify-content: flex-end;
+    padding: 1rem 1.5rem;
+}
+
+.quantity-field {
+    max-width: 7rem;
 }
 
 .secondary-text {
@@ -58,21 +70,19 @@
     color: var(--lp-primary);
 }
 
-.summary-card {
-    background: var(--lp-primary);
-    color: #fff;
-    height: 100%;
-}
-
-.summary-caption {
-    opacity: 0.78;
-}
-
 .section-heading {
     align-items: center;
     display: flex;
     justify-content: space-between;
     padding: 1.25rem 1.5rem 0.75rem;
+}
+
+.loading-state {
+    align-items: center;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    padding: 2rem;
 }
 
 @media (max-width: 600px) {

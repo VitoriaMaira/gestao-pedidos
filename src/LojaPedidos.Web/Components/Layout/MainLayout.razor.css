@@ -1,5 +1,5 @@
 ﻿.app-header {
-    border-bottom: 3px solid var(--lp-accent);
+    border-bottom: 2px solid var(--lp-accent);
 }
 
 .brand-link {
@@ -13,29 +13,17 @@
 .brand-mark {
     align-items: center;
     background: var(--lp-accent);
-    border-radius: 12px;
+    border-radius: 8px;
     color: #fff;
     display: inline-flex;
-    height: 44px;
+    height: 40px;
     justify-content: center;
-    width: 44px;
-}
-
-.brand-text {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.1;
+    width: 40px;
 }
 
 .brand-text strong {
     font-size: 1rem;
     letter-spacing: 0.01em;
-}
-
-.brand-text small {
-    font-size: 0.7rem;
-    margin-top: 0.25rem;
-    opacity: 0.78;
 }
 
 .main-navigation {
@@ -49,7 +37,6 @@
 }
 
 @media (max-width: 600px) {
-    .brand-text small,
     .nav-label {
         display: none;
     }

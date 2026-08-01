@@ -44,7 +44,7 @@ public static class AppTheme
             H1 = new H1Typography
             {
                 FontFamily = ["Montserrat", "Segoe UI", "Arial", "sans-serif"],
-                FontSize = "32px",
+                FontSize = "28px",
                 FontWeight = "700",
                 LineHeight = "1.2"
             },

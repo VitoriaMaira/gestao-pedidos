@@ -7,44 +7,14 @@
     <div>
         <MudText Typo="Typo.h1" HtmlTag="h1">Pedidos</MudText>
         <MudText Typo="Typo.body1" Class="page-description">
-            Consulte pedidos paginados, filtre a operação e acompanhe cada etapa do fluxo.
+            Consulte e filtre os pedidos cadastrados.
         </MudText>
     </div>
 
-    <MudButton Href="/pedidos/novo"
-               Variant="Variant.Filled"
-               Color="Color.Secondary"
-               StartIcon="@Icons.Material.Outlined.Add">
-        Novo pedido
-    </MudButton>
 </div>
 
-<section class="backend-highlights" aria-label="Recursos da Loja Pedidos">
-    <article>
-        <MudIcon Icon="@Icons.Material.Outlined.FilterAlt" Color="Color.Primary" />
-        <div>
-            <strong>Consulta eficiente</strong>
-            <span>Filtros por CPF e status processados pela API.</span>
-        </div>
-    </article>
-    <article>
-        <MudIcon Icon="@Icons.Material.Outlined.Rule" Color="Color.Secondary" />
-        <div>
-            <strong>Fluxo controlado</strong>
-            <span>Transições de status protegidas pelas regras do pedido.</span>
-        </div>
-    </article>
-    <article>
-        <MudIcon Icon="@Icons.Material.Outlined.Verified" Color="Color.Success" />
-        <div>
-            <strong>Respostas claras</strong>
-            <span>Validações e erros padronizados em todas as operações.</span>
-        </div>
-    </article>
-</section>
-
-<MudPaper Class="filters-card pa-5" Elevation="0" Outlined="true">
-    <MudText Typo="Typo.h6" HtmlTag="h2" Class="mb-4">Filtros</MudText>
+<MudPaper Class="filters-card pa-4" Elevation="0" Outlined="true">
+    <MudText Typo="Typo.h6" HtmlTag="h2" Class="mb-3">Filtros</MudText>
 
     <MudGrid Spacing="3">
         <MudItem xs="12" md="5">
@@ -56,8 +26,6 @@
                           Margin="Margin.Dense"
                           Clearable="true"
                           Immediate="true"
-                          Adornment="Adornment.Start"
-                          AdornmentIcon="@Icons.Material.Outlined.Badge"
                           OnKeyDown="TratarTeclaDoFiltroAsync" />
         </MudItem>
 
@@ -67,8 +35,7 @@
                        Label="Status do pedido"
                        Variant="Variant.Outlined"
                        Margin="Margin.Dense"
-                       Clearable="true"
-                       AdornmentIcon="@Icons.Material.Outlined.Flag">
+                       Clearable="true">
                 @foreach (var status in Enum.GetValues<StatusPedido>())
                 {
                     <MudSelectItem T="StatusPedido?" Value="@((StatusPedido?)status)">
@@ -100,14 +67,14 @@
 
 @if (_carregando)
 {
-    <MudPaper Class="content-card pa-5" Elevation="0" Outlined="true" aria-busy="true">
-        <MudSkeleton SkeletonType="SkeletonType.Text" Width="180px" Height="28px" />
-        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="260px" Class="mt-4" />
-    </MudPaper>
+    <div class="loading-state" aria-busy="true">
+        <MudProgressCircular Color="Color.Primary" Size="Size.Small" Indeterminate="true" />
+        <span>Carregando pedidos...</span>
+    </div>
 }
 else if (_mensagemErro is not null)
 {
-    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="content-card">
+    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">
         <div class="error-content">
             <span>@_mensagemErro</span>
             <MudButton Variant="Variant.Text"
@@ -121,14 +88,8 @@ else if (_mensagemErro is not null)
 }
 else if (_pedidos.Count == 0)
 {
-    <MudPaper Class="empty-state pa-8" Elevation="0" Outlined="true">
-        <MudIcon Icon="@Icons.Material.Outlined.ReceiptLong" Size="Size.Large" Color="Color.Secondary" />
-        <MudText Typo="Typo.h4" HtmlTag="h2" Class="mt-3">Nenhum pedido encontrado</MudText>
-        <MudText Typo="Typo.body1" Class="empty-description">
-            @(TemFiltros
-                ? "Não encontramos pedidos com os filtros informados."
-                : "Os pedidos cadastrados aparecerão aqui.")
-        </MudText>
+    <MudPaper Class="empty-state pa-5" Elevation="0" Outlined="true">
+        <MudText Typo="Typo.h6" HtmlTag="h2">Nenhum pedido encontrado.</MudText>
         @if (TemFiltros)
         {
             <MudButton Variant="Variant.Text"
@@ -144,10 +105,7 @@ else
 {
     <MudPaper Class="content-card" Elevation="0" Outlined="true">
         <div class="list-summary">
-            <div>
-                <MudText Typo="Typo.h6" HtmlTag="h2">Pedidos encontrados</MudText>
-                <MudText Typo="Typo.body2" Class="summary-text">@TextoDoResumo</MudText>
-            </div>
+            <MudText Typo="Typo.body1">@TextoDoResumo</MudText>
 
             <MudSelect T="int"
                        Value="_tamanhoPagina"
@@ -175,7 +133,7 @@ else
                 <MudTh>Status</MudTh>
                 <MudTh>Itens</MudTh>
                 <MudTh Class="text-right">Total</MudTh>
-                <MudTh Class="text-right">Ações</MudTh>
+                <MudTh>Ações</MudTh>
             </HeaderContent>
             <RowTemplate Context="pedido">
                 <MudTd DataLabel="Pedido">
@@ -194,12 +152,13 @@ else
                 <MudTd DataLabel="Total" Class="text-right total-value">
                     @FormatarValor(pedido.Total)
                 </MudTd>
-                <MudTd DataLabel="Ações" Class="text-right">
-                    <MudIconButton Href="@($"/pedidos/{pedido.Id}")"
-                                   Icon="@Icons.Material.Outlined.Visibility"
-                                   Color="Color.Primary"
-                                   Size="Size.Small"
-                                   aria-label="@($"Ver detalhes do pedido {ObterCodigo(pedido.Id)}")" />
+                <MudTd DataLabel="Ações">
+                    <MudButton Href="@($"/pedidos/{pedido.Id}")"
+                               Variant="Variant.Text"
+                               Color="Color.Primary"
+                               Size="Size.Small">
+                        Ver detalhes
+                    </MudButton>
                 </MudTd>
             </RowTemplate>
         </MudTable>

@@ -5,8 +5,8 @@
     --lp-surface: #ffffff;
     --lp-text: #1f2937;
     --lp-border: #d8e0e8;
-    --lp-radius-card: 14px;
-    --lp-shadow-card: 0 8px 24px rgb(15 53 96 / 8%);
+    --lp-radius-card: 8px;
+    --lp-shadow-card: none;
 }
 
 html,

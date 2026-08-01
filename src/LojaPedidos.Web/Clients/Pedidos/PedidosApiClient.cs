@@ -43,6 +43,26 @@ public sealed class PedidosApiClient(HttpClient httpClient) : IPedidosApiClient
             "Não foi possível consultar o pedido.",
             cancellationToken);
 
+    public Task<ApiResult<PedidoResponse>> AlterarAsync(
+        Guid id,
+        AlterarPedidoRequest request,
+        CancellationToken cancellationToken = default) =>
+        EnviarAsync<PedidoResponse>(HttpMethod.Put, $"api/pedidos/{id}", request,
+            "Não foi possível atualizar o pedido.", cancellationToken);
+
+    public Task<ApiResult<AtualizarStatusPedidoResponse>> AtualizarStatusAsync(
+        Guid id,
+        AtualizarStatusPedidoRequest request,
+        CancellationToken cancellationToken = default) =>
+        EnviarAsync<AtualizarStatusPedidoResponse>(HttpMethod.Put, $"api/pedidos/{id}/status", request,
+            "Não foi possível atualizar o status do pedido.", cancellationToken);
+
+    public Task<ApiResult<ExcluirPedidoResponse>> ExcluirAsync(
+        Guid id,
+        CancellationToken cancellationToken = default) =>
+        EnviarAsync<ExcluirPedidoResponse>(HttpMethod.Delete, $"api/pedidos/{id}", null,
+            "Não foi possível excluir o pedido.", cancellationToken);
+
     private async Task<ApiResult<T>> EnviarAsync<T>(
         HttpMethod metodo,
         string url,
@@ -126,9 +146,13 @@ public sealed class PedidosApiClient(HttpClient httpClient) : IPedidosApiClient
     {
         try
         {
-            var problema = await response.Content.ReadFromJsonAsync<ApiProblem>(
-                JsonOptions,
-                cancellationToken);
+            var conteudo = await response.Content.ReadAsStringAsync(cancellationToken);
+            if (string.IsNullOrWhiteSpace(conteudo))
+            {
+                return ApiResult<T>.Falha(mensagemPadrao, response.StatusCode);
+            }
+
+            var problema = JsonSerializer.Deserialize<ApiProblem>(conteudo, JsonOptions);
 
             var mensagem = problema?.Detail ?? problema?.Title ?? mensagemPadrao;
 
@@ -138,6 +162,10 @@ public sealed class PedidosApiClient(HttpClient httpClient) : IPedidosApiClient
                 problema?.Errors);
         }
         catch (JsonException)
+        {
+            return ApiResult<T>.Falha(mensagemPadrao, response.StatusCode);
+        }
+        catch (NotSupportedException)
         {
             return ApiResult<T>.Falha(mensagemPadrao, response.StatusCode);
         }

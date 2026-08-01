@@ -16,6 +16,8 @@ public partial class PedidoCreate
     private readonly PatternMask _mascaraCpf = new("000.000.000-00");
     private MudForm? _form;
     private IReadOnlyCollection<string> _errosApi = [];
+    private IReadOnlyDictionary<string, string[]> _errosApiPorCampo =
+        new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
     private string? _mensagemErro;
     private bool _formularioValido;
     private bool _salvando;
@@ -64,6 +66,7 @@ public partial class PedidoCreate
         _salvando = true;
         _mensagemErro = null;
         _errosApi = [];
+        _errosApiPorCampo = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
 
         var request = new CriarPedidoRequest(
             new CriarCompradorRequest(
@@ -85,6 +88,9 @@ public partial class PedidoCreate
                 .SelectMany(erro => erro.Value)
                 .Distinct()
                 .ToArray() ?? [];
+            _errosApiPorCampo = resultado.Erros is null
+                ? new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
+                : new Dictionary<string, string[]>(resultado.Erros, StringComparer.OrdinalIgnoreCase);
             _salvando = false;
             return;
         }
@@ -92,6 +98,13 @@ public partial class PedidoCreate
         Snackbar.Add(resultado.Dados.Mensagem, Severity.Success);
         NavigationManager.NavigateTo($"/pedidos/{resultado.Dados.Id}");
     }
+
+    private bool TemErroApi(string campo) => ObterErroApi(campo) is not null;
+
+    private string? ObterErroApi(string campo) =>
+        _errosApiPorCampo.TryGetValue(campo, out var mensagens)
+            ? mensagens.FirstOrDefault()
+            : null;
 
     private static string? ValidarCpf(string? valor)
     {
