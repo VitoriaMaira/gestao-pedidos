@@ -1,4 +1,5 @@
 using FluentValidation;
+using LojaPedidos.Application.Common.Exceptions;
 using LojaPedidos.Application.Pedidos.ConsultarPedido;
 using LojaPedidos.Domain.Repositories;
 
@@ -9,7 +10,7 @@ public sealed class AlterarPedidoUseCase(
     IUnitOfWork unitOfWork,
     IValidator<AlterarPedidoRequest> validator) : IAlterarPedidoUseCase
 {
-    public async Task<PedidoResponse?> ExecutarAsync(
+    public async Task<PedidoResponse> ExecutarAsync(
         Guid id,
         AlterarPedidoRequest request,
         CancellationToken cancellationToken = default)
@@ -20,7 +21,7 @@ public sealed class AlterarPedidoUseCase(
 
         if (pedido is null)
         {
-            return null;
+            throw new NotFoundException("Não foi possível encontrar o pedido informado.");
         }
 
         foreach (var itemRequest in request.Itens!)

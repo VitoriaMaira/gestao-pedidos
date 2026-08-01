@@ -1,4 +1,5 @@
 using FluentValidation;
+using LojaPedidos.Application.Common.Exceptions;
 using LojaPedidos.Application.Pedidos.ConsultarPedido;
 using LojaPedidos.Domain.Repositories;
 
@@ -10,7 +11,7 @@ public sealed class AtualizarStatusPedidoUseCase(
     IValidator<AtualizarStatusPedidoRequest> validator)
     : IAtualizarStatusPedidoUseCase
 {
-    public async Task<AtualizarStatusPedidoResponse?> ExecutarAsync(
+    public async Task<AtualizarStatusPedidoResponse> ExecutarAsync(
         Guid id,
         AtualizarStatusPedidoRequest request,
         CancellationToken cancellationToken = default)
@@ -21,7 +22,7 @@ public sealed class AtualizarStatusPedidoUseCase(
 
         if (pedido is null)
         {
-            return null;
+            throw new NotFoundException("Não foi possível encontrar o pedido informado.");
         }
 
         var statusJaDefinido = pedido.Status == request.Status;

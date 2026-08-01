@@ -42,7 +42,7 @@ public sealed class PedidosController(
     {
         var response = await obterPedidoPorIdUseCase.ExecutarAsync(id, cancellationToken);
 
-        return response is null ? NotFound() : Ok(response);
+        return Ok(response);
     }
 
     [HttpGet]
@@ -71,7 +71,7 @@ public sealed class PedidosController(
             request,
             cancellationToken);
 
-        return response is null ? NotFound() : Ok(response);
+        return Ok(response);
     }
 
     [HttpPut("{id:guid}/status")]
@@ -88,16 +88,6 @@ public sealed class PedidosController(
             request,
             cancellationToken);
 
-        if (response is null)
-        {
-            return NotFound(new ProblemDetails
-            {
-                Status = StatusCodes.Status404NotFound,
-                Title = "Pedido não encontrado.",
-                Detail = "Não foi possível atualizar o status porque o pedido informado não existe."
-            });
-        }
-
         return Ok(response);
     }
 
@@ -108,9 +98,9 @@ public sealed class PedidosController(
         Guid id,
         CancellationToken cancellationToken)
     {
-        var excluido = await excluirPedidoUseCase.ExecutarAsync(id, cancellationToken);
+        await excluirPedidoUseCase.ExecutarAsync(id, cancellationToken);
 
-        return excluido ? NoContent() : NotFound();
+        return NoContent();
     }
 
 }

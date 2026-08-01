@@ -2,7 +2,7 @@ namespace LojaPedidos.Application.Pedidos.ExcluirPedido;
 
 public interface IExcluirPedidoUseCase
 {
-    Task<bool> ExecutarAsync(
+    Task ExecutarAsync(
         Guid id,
         CancellationToken cancellationToken = default);
 }

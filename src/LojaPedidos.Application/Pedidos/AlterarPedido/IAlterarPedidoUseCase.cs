@@ -4,7 +4,7 @@ namespace LojaPedidos.Application.Pedidos.AlterarPedido;
 
 public interface IAlterarPedidoUseCase
 {
-    Task<PedidoResponse?> ExecutarAsync(
+    Task<PedidoResponse> ExecutarAsync(
         Guid id,
         AlterarPedidoRequest request,
         CancellationToken cancellationToken = default);
