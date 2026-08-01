@@ -1,5 +1,7 @@
 using FluentValidation;
+using LojaPedidos.Application.Pedidos.ConsultarPedido;
 using LojaPedidos.Application.Pedidos.CriarPedido;
+using LojaPedidos.Application.Pedidos.ListarPedidos;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LojaPedidos.Application;
@@ -9,7 +11,9 @@ public static class DependencyInjection
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         services.AddValidatorsFromAssemblyContaining<CriarPedidoRequestValidator>();
-        services.AddScoped<CriarPedidoUseCase>();
+        services.AddScoped<ICriarPedidoUseCase, CriarPedidoUseCase>();
+        services.AddScoped<IObterPedidoPorIdUseCase, ObterPedidoPorIdUseCase>();
+        services.AddScoped<IListarPedidosUseCase, ListarPedidosUseCase>();
 
         return services;
     }

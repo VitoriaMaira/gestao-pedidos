@@ -1,11 +1,16 @@
+using LojaPedidos.Application.Pedidos.ConsultarPedido;
 using LojaPedidos.Application.Pedidos.CriarPedido;
+using LojaPedidos.Application.Pedidos.ListarPedidos;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LojaPedidos.Api.Controllers;
 
 [ApiController]
 [Route("api/pedidos")]
-public sealed class PedidosController(CriarPedidoUseCase criarPedidoUseCase) : ControllerBase
+public sealed class PedidosController(
+    ICriarPedidoUseCase criarPedidoUseCase,
+    IObterPedidoPorIdUseCase obterPedidoPorIdUseCase,
+    IListarPedidosUseCase listarPedidosUseCase) : ControllerBase
 {
     [HttpPost]
     [ProducesResponseType<CriarPedidoResponse>(StatusCodes.Status201Created)]
@@ -17,5 +22,29 @@ public sealed class PedidosController(CriarPedidoUseCase criarPedidoUseCase) : C
         var response = await criarPedidoUseCase.ExecutarAsync(request, cancellationToken);
 
         return Created($"/api/pedidos/{response.Id}", response);
+    }
+
+    [HttpGet("{id:guid}")]
+    [ProducesResponseType<PedidoResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ObterPorIdAsync(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var response = await obterPedidoPorIdUseCase.ExecutarAsync(id, cancellationToken);
+
+        return response is null ? NotFound() : Ok(response);
+    }
+
+    [HttpGet]
+    [ProducesResponseType<ListarPedidosResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ListarAsync(
+        [FromQuery] ListarPedidosRequest request,
+        CancellationToken cancellationToken)
+    {
+        var response = await listarPedidosUseCase.ExecutarAsync(request, cancellationToken);
+
+        return Ok(response);
     }
 }
