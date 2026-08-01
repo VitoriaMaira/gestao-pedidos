@@ -1,6 +1,7 @@
 using FluentValidation;
 using LojaPedidos.Application.Pedidos.ConsultarPedido;
 using LojaPedidos.Domain.Repositories;
+using LojaPedidos.Domain.ValueObjects;
 
 namespace LojaPedidos.Application.Pedidos.ListarPedidos;
 
@@ -14,11 +15,15 @@ public sealed class ListarPedidosUseCase(
     {
         await validator.ValidateAndThrowAsync(request, cancellationToken);
 
+        var cpf = string.IsNullOrWhiteSpace(request.Cpf)
+            ? null
+            : Cpf.Normalizar(request.Cpf);
+
         var (pedidos, total) = await pedidoRepository.ListarAsync(
             request.Pagina,
             request.TamanhoPagina,
             request.Status,
-            request.CompradorId,
+            cpf,
             cancellationToken);
 
         var itens = pedidos.Select(PedidoResponse.Criar).ToArray();

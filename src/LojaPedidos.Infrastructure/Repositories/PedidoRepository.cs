@@ -23,7 +23,7 @@ public sealed class PedidoRepository(LojaPedidosDbContext dbContext)
         int pagina,
         int tamanhoPagina,
         StatusPedido? status = null,
-        Guid? compradorId = null,
+        string? cpf = null,
         CancellationToken cancellationToken = default)
     {
         var consulta = DbSet
@@ -38,9 +38,9 @@ public sealed class PedidoRepository(LojaPedidosDbContext dbContext)
             consulta = consulta.Where(pedido => pedido.Status == status.Value);
         }
 
-        if (compradorId.HasValue)
+        if (!string.IsNullOrWhiteSpace(cpf))
         {
-            consulta = consulta.Where(pedido => pedido.CompradorId == compradorId.Value);
+            consulta = consulta.Where(pedido => pedido.Comprador.Cpf == cpf);
         }
 
         var total = await consulta.CountAsync(cancellationToken);

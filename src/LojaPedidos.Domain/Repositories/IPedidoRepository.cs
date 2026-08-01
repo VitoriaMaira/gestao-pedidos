@@ -9,6 +9,6 @@ public interface IPedidoRepository : IRepositoryBase<Pedido>
         int pagina,
         int tamanhoPagina,
         StatusPedido? status = null,
-        Guid? compradorId = null,
+        string? cpf = null,
         CancellationToken cancellationToken = default);
 }
