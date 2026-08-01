@@ -18,5 +18,12 @@ public sealed class CompradorConfiguration : IEntityTypeConfiguration<Comprador>
         builder.Property(comprador => comprador.Nome)
             .HasMaxLength(150)
             .IsRequired();
+
+        builder.Property(comprador => comprador.Cpf)
+            .HasMaxLength(11)
+            .IsRequired();
+
+        builder.HasIndex(comprador => comprador.Cpf)
+            .IsUnique();
     }
 }
