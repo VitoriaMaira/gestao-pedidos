@@ -8,7 +8,7 @@ public sealed class ExcluirPedidoUseCase(
 {
     public async Task<bool> ExecutarAsync(
         Guid id,
-        CancellationToken cancellationToken = default)
+         CancellationToken cancellationToken = default)
     {
         var pedido = await pedidoRepository.ObterPorIdAsync(id, cancellationToken);
 
@@ -20,6 +20,6 @@ public sealed class ExcluirPedidoUseCase(
         pedidoRepository.Remover(pedido);
         await unitOfWork.CommitAsync(cancellationToken);
 
-        return true;
+         return true;
     }
 }

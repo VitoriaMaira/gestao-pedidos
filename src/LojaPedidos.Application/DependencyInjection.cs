@@ -2,6 +2,7 @@ using FluentValidation;
 using LojaPedidos.Application.Pedidos.AlterarPedido;
 using LojaPedidos.Application.Pedidos.ConsultarPedido;
 using LojaPedidos.Application.Pedidos.CriarPedido;
+using LojaPedidos.Application.Pedidos.ExcluirPedido;
 using LojaPedidos.Application.Pedidos.ListarPedidos;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -16,6 +17,7 @@ public static class DependencyInjection
         services.AddScoped<IObterPedidoPorIdUseCase, ObterPedidoPorIdUseCase>();
         services.AddScoped<IListarPedidosUseCase, ListarPedidosUseCase>();
         services.AddScoped<IAlterarPedidoUseCase, AlterarPedidoUseCase>();
+        services.AddScoped<IExcluirPedidoUseCase, ExcluirPedidoUseCase>();
 
         return services;
     }

@@ -1,6 +1,7 @@
 using LojaPedidos.Application.Pedidos.AlterarPedido;
 using LojaPedidos.Application.Pedidos.ConsultarPedido;
 using LojaPedidos.Application.Pedidos.CriarPedido;
+using LojaPedidos.Application.Pedidos.ExcluirPedido;
 using LojaPedidos.Application.Pedidos.ListarPedidos;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,7 +13,8 @@ public sealed class PedidosController(
     ICriarPedidoUseCase criarPedidoUseCase,
     IObterPedidoPorIdUseCase obterPedidoPorIdUseCase,
     IListarPedidosUseCase listarPedidosUseCase,
-    IAlterarPedidoUseCase alterarPedidoUseCase) : ControllerBase
+    IAlterarPedidoUseCase alterarPedidoUseCase,
+    IExcluirPedidoUseCase excluirPedidoUseCase) : ControllerBase
 {
     [HttpPost]
     [ProducesResponseType<CriarPedidoResponse>(StatusCodes.Status201Created)]
@@ -65,5 +67,17 @@ public sealed class PedidosController(
             cancellationToken);
 
         return response is null ? NotFound() : Ok(response);
+    }
+
+    [HttpDelete("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ExcluirAsync(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var excluido = await excluirPedidoUseCase.ExecutarAsync(id, cancellationToken);
+
+        return excluido ? NoContent() : NotFound();
     }
 }
