@@ -23,6 +23,9 @@ public sealed class FluxoPedidoTests
             Assert.NotNull(response.Content);
             Assert.Equal(pedido.Id, response.Content.Id);
             Assert.Equal(StatusPedido.Iniciado, response.Content.Status);
+            Assert.Equal(
+                Assert.Single(pedido.Itens).Id,
+                Assert.Single(response.Content.Itens).Id);
         }
         finally
         {

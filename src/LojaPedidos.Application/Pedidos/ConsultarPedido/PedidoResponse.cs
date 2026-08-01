@@ -16,6 +16,7 @@ public sealed record PedidoResponse(
     {
         var itens = pedido.Itens
             .Select(item => new ItemPedidoResponse(
+                item.Id,
                 item.ProdutoId,
                 item.Produto.Nome,
                 item.Quantidade,
@@ -35,6 +36,7 @@ public sealed record PedidoResponse(
 }
 
 public sealed record ItemPedidoResponse(
+    Guid Id,
     Guid ProdutoId,
     string Produto,
     int Quantidade,
