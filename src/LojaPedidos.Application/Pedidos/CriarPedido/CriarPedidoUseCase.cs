@@ -21,6 +21,7 @@ public sealed class CriarPedidoUseCase(
 
         var cpf = Cpf.Normalizar(request.Comprador!.Cpf);
         var comprador = await compradorRepository.ObterPorCpfAsync(cpf, cancellationToken);
+        var compradorExistente = comprador is not null;
 
         if (comprador is null)
         {
@@ -45,6 +46,10 @@ public sealed class CriarPedidoUseCase(
         await pedidoRepository.AdicionarAsync(pedido, cancellationToken);
         await unitOfWork.CommitAsync(cancellationToken);
 
-        return CriarPedidoResponse.Criar(pedido);
+        var mensagem = compradorExistente
+            ? "Pedido criado com sucesso. O comprador já cadastrado foi reutilizado."
+            : "Pedido criado com sucesso.";
+
+        return CriarPedidoResponse.Criar(pedido, mensagem);
     }
 }

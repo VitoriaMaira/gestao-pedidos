@@ -25,13 +25,16 @@ public sealed class PedidosController(
     {
         var response = await criarPedidoUseCase.ExecutarAsync(request, cancellationToken);
 
-        return Created($"/api/pedidos/{response.Id}", response);
+        return CreatedAtAction(
+            nameof(ObterPorId),
+            new { id = response.Id },
+            response);
     }
 
     [HttpGet("{id:guid}")]
     [ProducesResponseType<PedidoResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ObterPorIdAsync(
+    public async Task<IActionResult> ObterPorId(
         Guid id,
         CancellationToken cancellationToken)
     {

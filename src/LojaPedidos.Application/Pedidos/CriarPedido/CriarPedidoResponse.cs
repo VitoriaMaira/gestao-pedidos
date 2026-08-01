@@ -4,6 +4,7 @@ using LojaPedidos.Domain.Enums;
 namespace LojaPedidos.Application.Pedidos.CriarPedido;
 
 public sealed record CriarPedidoResponse(
+    string Mensagem,
     Guid Id,
     CriarPedidoCompradorResponse Comprador,
     StatusPedido Status,
@@ -11,7 +12,7 @@ public sealed record CriarPedidoResponse(
     DateTimeOffset CriadoEm,
     IReadOnlyCollection<CriarPedidoItemResponse> Itens)
 {
-    public static CriarPedidoResponse Criar(Pedido pedido)
+    public static CriarPedidoResponse Criar(Pedido pedido, string mensagem)
     {
         var itens = pedido.Itens
             .Select(item => new CriarPedidoItemResponse(
@@ -26,6 +27,7 @@ public sealed record CriarPedidoResponse(
             .ToArray();
 
         return new CriarPedidoResponse(
+            mensagem,
             pedido.Id,
             new CriarPedidoCompradorResponse(
                 pedido.Comprador.Id,
