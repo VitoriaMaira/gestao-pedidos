@@ -1,8 +1,8 @@
 <div align="center">
 
-# 🛍️ Loja Pedidos API
+# 🛍️ Loja Pedidos
 
-### Uma API completa para gerenciar o ciclo de vida de pedidos de um e-commerce
+### Aplicação para gerenciar o ciclo de vida de pedidos de um e-commerce
 
 Do recebimento ao envio, com regras de negócio, persistência, observabilidade e testes automatizados.
 
@@ -48,6 +48,7 @@ O ambiente também faz parte da entrega. A solução pode ser iniciada com .NET 
 |---|---|
 | **Regras de negócio** | Ciclo completo do pedido, total calculado pelos itens e transições de status protegidas no domínio |
 | **API REST** | Criação, consulta, alteração, mudança de status e exclusão, com códigos HTTP e respostas consistentes |
+| **Frontend Web** | Interface em Blazor WebAssembly e MudBlazor para utilizar todo o fluxo da API |
 | **Consultas** | Listagem paginada com filtros opcionais por CPF e status |
 | **Persistência** | SQL Server, Entity Framework Core, migrations automáticas, repositórios e Unit of Work |
 | **Ambiente local** | API e banco orquestrados pelo Aspire, com dashboard e volume persistente |
@@ -70,9 +71,28 @@ O ambiente também faz parte da entrega. A solução pode ser iniciada com .NET 
 - Health checks e telemetria fornecidos pelo ServiceDefaults.
 - Testes unitários e de integração.
 
+## 🖥️ Frontend
+
+O projeto `LojaPedidos.Web` é uma aplicação Blazor WebAssembly com componentes MudBlazor. Ele consome os contratos HTTP da API e mantém o tratamento de erros centralizado no cliente de pedidos.
+
+Pela interface é possível criar pedidos, consultar a listagem paginada, filtrar por CPF e status, abrir os detalhes, alterar quantidades, processar, enviar, cancelar e excluir. As ações disponíveis acompanham o status atual do pedido, enquanto a validação final e as regras de negócio permanecem na API.
+
+A estrutura principal do projeto Web é:
+
+```text
+LojaPedidos.Web/
+├── Clients/          # comunicação HTTP com a API
+├── Components/       # layout e componentes compartilhados
+├── Contracts/        # requests e responses usados pela interface
+├── Pages/Pedidos/    # listagem, criação e detalhes
+├── Theme/            # tema do MudBlazor
+└── wwwroot/          # configurações e arquivos estáticos
+```
+
 ## 🧰 Tecnologias utilizadas
 
 - **.NET 9 e ASP.NET Core:** base da API REST.
+- **Blazor WebAssembly e MudBlazor:** interface web responsiva para consumir a API.
 - **Entity Framework Core 9:** mapeamento e persistência das entidades.
 - **SQL Server 2022:** banco de dados relacional.
 - **FluentValidation:** validação dos dados de entrada dos casos de uso.
@@ -87,6 +107,7 @@ O ambiente também faz parte da entrega. A solução pode ser iniciada com .NET 
 A solução separa as responsabilidades em projetos com dependências direcionadas para o domínio:
 
 - **LojaPedidos.Api:** controllers, configuração HTTP, Swagger, CORS e filtro centralizado de erros.
+- **LojaPedidos.Web:** páginas, componentes, contratos e cliente HTTP do frontend Blazor.
 - **LojaPedidos.Application:** casos de uso, DTOs, validações e contratos usados pela aplicação.
 - **LojaPedidos.Domain:** entidades, regras de negócio, value objects, exceções e contratos dos repositórios.
 - **LojaPedidos.Infrastructure:** DbContext, configurações do Entity Framework, migrations, repositórios e Unit of Work.
@@ -98,7 +119,7 @@ A solução separa as responsabilidades em projetos com dependências direcionad
 
 ```mermaid
 flowchart LR
-    Client[Cliente] --> API[LojaPedidos.Api]
+    Web[LojaPedidos.Web] --> API[LojaPedidos.Api]
     API --> Application[LojaPedidos.Application]
     Application --> Domain[LojaPedidos.Domain]
     Infrastructure[LojaPedidos.Infrastructure] --> Application
@@ -106,6 +127,7 @@ flowchart LR
     Infrastructure --> EF[Entity Framework Core]
     EF --> Database[(SQL Server)]
     AppHost[LojaPedidos.AppHost] -. orquestra .-> API
+    AppHost -. orquestra .-> Web
     AppHost -. orquestra .-> Database
 ```
 
@@ -135,7 +157,7 @@ Com o Docker Desktop em execução, inicie o AppHost:
 dotnet run --project src/LojaPedidos.AppHost
 ```
 
-O Aspire cria o SQL Server com volume persistente, inicia a API e apresenta no dashboard os recursos, logs, health checks e dados de telemetria. O endereço do dashboard é exibido no terminal e a página contém um link para o Swagger da API.
+O Aspire cria o SQL Server com volume persistente, inicia a API e o frontend e apresenta no dashboard os recursos, logs, health checks e dados de telemetria. O endereço do dashboard é exibido no terminal. Use o link **Loja Pedidos Web** ou acesse `http://localhost:5056`. O Swagger da API fica disponível pelo link do recurso `api`.
 
 ### Opção 2: Docker Compose
 
@@ -168,6 +190,14 @@ docker compose --env-file deploy\.env -f deploy\compose.yaml down
 ```
 
 O volume `sqlserver-data` mantém os dados entre reinicializações do ambiente.
+
+O Compose atual inicia a API e o SQL Server. Para usar o frontend com esse ambiente, mantenha os containers ativos e execute em outro terminal:
+
+```powershell
+dotnet run --project src/LojaPedidos.Web --launch-profile compose
+```
+
+Nesse perfil, o frontend acessa a API em `http://localhost:8080` e fica disponível em `http://localhost:5056`.
 
 ## 🗄️ Banco de dados e migrations
 
@@ -287,6 +317,7 @@ A organização em camadas mantém as regras do pedido independentes da API e do
 ```text
 src/
 ├── LojaPedidos.Api
+├── LojaPedidos.Web
 ├── LojaPedidos.Application
 ├── LojaPedidos.Domain
 ├── LojaPedidos.Infrastructure
