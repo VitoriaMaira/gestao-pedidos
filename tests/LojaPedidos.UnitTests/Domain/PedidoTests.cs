@@ -131,6 +131,27 @@ public sealed class PedidoTests
         Assert.Equal("Apenas pedidos processados podem ser enviados.", excecao.Message);
     }
 
+    [Fact]
+    public void AlterarStatus_DeveProcessarEEnviar_QuandoTransicoesForemValidas()
+    {
+        var pedido = CriarPedido();
+
+        pedido.AlterarStatus(StatusPedido.Processado);
+        pedido.AlterarStatus(StatusPedido.Enviado);
+
+        Assert.Equal(StatusPedido.Enviado, pedido.Status);
+    }
+
+    [Fact]
+    public void AlterarStatus_DeveCancelar_QuandoPedidoEstiverIniciado()
+    {
+        var pedido = CriarPedido();
+
+        pedido.AlterarStatus(StatusPedido.Cancelado);
+
+        Assert.Equal(StatusPedido.Cancelado, pedido.Status);
+    }
+
     private static Pedido CriarPedido()
     {
         return new Pedido(CriarComprador(), [CriarItem()]);

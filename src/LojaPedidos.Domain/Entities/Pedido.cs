@@ -86,6 +86,29 @@ public sealed class Pedido : Entity
         RegistrarAtualizacao();
     }
 
+    public void AlterarStatus(StatusPedido novoStatus)
+    {
+        if (Status == novoStatus)
+        {
+            return;
+        }
+
+        switch (novoStatus)
+        {
+            case StatusPedido.Processado:
+                Processar();
+                break;
+            case StatusPedido.Enviado:
+                Enviar();
+                break;
+            case StatusPedido.Cancelado:
+                Cancelar();
+                break;
+            default:
+                throw new DomainException("O status informado não pode ser aplicado ao pedido.");
+        }
+    }
+
     private Comprador ValidarComprador(Comprador? comprador)
     {
         if (comprador is null)

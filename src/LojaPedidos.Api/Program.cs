@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using LojaPedidos.Application;
 using LojaPedidos.Api.Filters;
 using LojaPedidos.Infrastructure;
@@ -7,8 +8,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddControllers(options =>
-    options.Filters.Add<ApiExceptionFilter>());
+builder.Services
+    .AddControllers(options => options.Filters.Add<ApiExceptionFilter>())
+    .AddJsonOptions(options =>
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 builder.AddServiceDefaults();
 builder.Services.AddApplication();
