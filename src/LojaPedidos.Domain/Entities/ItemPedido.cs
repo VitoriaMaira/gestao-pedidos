@@ -40,6 +40,16 @@ public sealed class ItemPedido : Entity
 
     public decimal Subtotal => PrecoUnitario * Quantidade;
 
+    internal void AlterarQuantidade(int quantidade)
+    {
+        if (quantidade <= 0)
+        {
+            throw new DomainException("A quantidade deve ser maior que zero.");
+        }
+
+        Quantidade = quantidade;
+    }
+
     internal void VincularAoPedido(Guid pedidoId)
     {
         if (pedidoId == Guid.Empty)

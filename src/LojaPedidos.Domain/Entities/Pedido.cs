@@ -35,16 +35,21 @@ public sealed class Pedido : Entity
 
     public decimal Total => _itens.Sum(item => item.Subtotal);
 
-    public void Alterar(Comprador comprador, IEnumerable<ItemPedido> itens)
+    public void AlterarQuantidadeItem(Guid itemId, int quantidade)
     {
         if (Status != StatusPedido.Iniciado)
         {
             throw new DomainException("Apenas pedidos não processados podem ser alterados.");
         }
 
-        Comprador = ValidarComprador(comprador);
-        _itens.Clear();
-        AdicionarItens(itens);
+        var item = _itens.SingleOrDefault(item => item.Id == itemId);
+
+        if (item is null)
+        {
+            throw new DomainException("O item informado não pertence ao pedido.");
+        }
+
+        item.AlterarQuantidade(quantidade);
         RegistrarAtualizacao();
     }
 
