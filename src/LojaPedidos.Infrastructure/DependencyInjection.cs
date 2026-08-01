@@ -1,3 +1,5 @@
+using LojaPedidos.Domain.Repositories;
+using LojaPedidos.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +18,11 @@ public static class DependencyInjection
 
         services.AddDbContext<LojaPedidosDbContext>(options =>
             options.UseSqlServer(connectionString));
+
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IPedidoRepository, PedidoRepository>();
+        services.AddScoped<ICompradorRepository, CompradorRepository>();
+        services.AddScoped<IProdutoRepository, ProdutoRepository>();
 
         return services;
     }
