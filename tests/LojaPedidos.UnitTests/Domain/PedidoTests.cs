@@ -102,7 +102,7 @@ public sealed class PedidoTests
 
     private static Comprador CriarComprador()
     {
-        return new Comprador("Maíra");
+        return new Comprador("Maíra", "12345678909");
     }
 
     private static Produto CriarProduto()
