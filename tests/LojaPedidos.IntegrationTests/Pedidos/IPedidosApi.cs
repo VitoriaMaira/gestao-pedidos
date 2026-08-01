@@ -3,6 +3,7 @@ using LojaPedidos.Application.Pedidos.AtualizarStatusPedido;
 using LojaPedidos.Application.Pedidos.ConsultarPedido;
 using LojaPedidos.Application.Pedidos.CriarPedido;
 using LojaPedidos.Application.Pedidos.ExcluirPedido;
+using LojaPedidos.Application.Pedidos.ListarPedidos;
 using Refit;
 
 namespace LojaPedidos.IntegrationTests.Pedidos;
@@ -14,6 +15,10 @@ public interface IPedidosApi
 
     [Get("/api/pedidos/{id}")]
     Task<ApiResponse<PedidoResponse>> ObterPorIdAsync(Guid id);
+
+    [Get("/api/pedidos")]
+    Task<ApiResponse<ListarPedidosResponse>> ListarAsync(
+        [Query] ListarPedidosRequest request);
 
     [Put("/api/pedidos/{id}")]
     Task<ApiResponse<PedidoResponse>> AlterarAsync(
