@@ -103,6 +103,54 @@ public sealed class FluxoPedidoTests
     }
 
     [Fact]
+    public async Task DeveCancelarPedidoProcessado()
+    {
+        var pedido = await CriarPedidoAsync();
+
+        try
+        {
+            await _api.AtualizarStatusAsync(
+                pedido.Id,
+                new AtualizarStatusPedidoRequest(StatusPedido.Processado));
+
+            var response = await _api.AtualizarStatusAsync(
+                pedido.Id,
+                new AtualizarStatusPedidoRequest(StatusPedido.Cancelado));
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(StatusPedido.Cancelado, response.Content?.Pedido.Status);
+        }
+        finally
+        {
+            await ExcluirPedidoAsync(pedido.Id);
+        }
+    }
+
+    [Fact]
+    public async Task DeveRejeitarAlteracaoDePedidoProcessado()
+    {
+        var pedido = await CriarPedidoAsync();
+        var item = Assert.Single(pedido.Itens);
+
+        try
+        {
+            await _api.AtualizarStatusAsync(
+                pedido.Id,
+                new AtualizarStatusPedidoRequest(StatusPedido.Processado));
+
+            var request = new AlterarPedidoRequest(
+                [new AlterarItemPedidoRequest(item.Id, 2)]);
+            var response = await _api.AlterarAsync(pedido.Id, request);
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+        finally
+        {
+            await ExcluirPedidoAsync(pedido.Id);
+        }
+    }
+
+    [Fact]
     public async Task DeveRejeitarEnvioDePedidoIniciado()
     {
         var pedido = await CriarPedidoAsync();
