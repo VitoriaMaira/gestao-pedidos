@@ -26,7 +26,7 @@ public sealed class FluxoPedidoTests
         }
         finally
         {
-            await _api.ExcluirAsync(pedido.Id);
+            await ExcluirPedidoAsync(pedido.Id);
         }
     }
 
@@ -50,7 +50,7 @@ public sealed class FluxoPedidoTests
         }
         finally
         {
-            await _api.ExcluirAsync(pedido.Id);
+            await ExcluirPedidoAsync(pedido.Id);
         }
     }
 
@@ -75,7 +75,7 @@ public sealed class FluxoPedidoTests
         }
         finally
         {
-            await _api.ExcluirAsync(pedido.Id);
+            await ExcluirPedidoAsync(pedido.Id);
         }
     }
 
@@ -95,7 +95,7 @@ public sealed class FluxoPedidoTests
         }
         finally
         {
-            await _api.ExcluirAsync(pedido.Id);
+            await ExcluirPedidoAsync(pedido.Id);
         }
     }
 
@@ -114,7 +114,7 @@ public sealed class FluxoPedidoTests
         }
         finally
         {
-            await _api.ExcluirAsync(pedido.Id);
+            await ExcluirPedidoAsync(pedido.Id);
         }
     }
 
@@ -133,5 +133,13 @@ public sealed class FluxoPedidoTests
         Assert.NotNull(response.Content);
 
         return response.Content;
+    }
+
+    private async Task ExcluirPedidoAsync(Guid id)
+    {
+        var response = await _api.ExcluirAsync(id);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("Pedido excluído com sucesso.", response.Content?.Mensagem);
     }
 }

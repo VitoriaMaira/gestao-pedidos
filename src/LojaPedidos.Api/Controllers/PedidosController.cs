@@ -140,15 +140,15 @@ public sealed class PedidosController(
     /// <param name="id">Identificador do pedido.</param>
     /// <param name="cancellationToken">Token de cancelamento da requisição.</param>
     [HttpDelete("{id:guid}")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ExcluirPedidoResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ExcluirAsync(
         Guid id,
         CancellationToken cancellationToken)
     {
-        await excluirPedidoUseCase.ExecutarAsync(id, cancellationToken);
+        var response = await excluirPedidoUseCase.ExecutarAsync(id, cancellationToken);
 
-        return NoContent();
+        return Ok(response);
     }
 
 }

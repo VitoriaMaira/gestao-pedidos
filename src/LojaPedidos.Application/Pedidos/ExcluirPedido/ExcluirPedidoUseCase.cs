@@ -7,7 +7,7 @@ public sealed class ExcluirPedidoUseCase(
     IPedidoRepository pedidoRepository,
     IUnitOfWork unitOfWork) : IExcluirPedidoUseCase
 {
-    public async Task ExecutarAsync(
+    public async Task<ExcluirPedidoResponse> ExecutarAsync(
         Guid id,
          CancellationToken cancellationToken = default)
     {
@@ -15,11 +15,13 @@ public sealed class ExcluirPedidoUseCase(
 
         if (pedido is null)
         {
-            throw new NotFoundException("Não foi possível encontrar o pedido informado.");
+            throw new NotFoundException(
+                "Não foi possível excluir o pedido porque ele não foi encontrado.");
         }
 
         pedidoRepository.Remover(pedido);
         await unitOfWork.CommitAsync(cancellationToken);
 
+        return new ExcluirPedidoResponse("Pedido excluído com sucesso.");
     }
 }

@@ -2,6 +2,7 @@ using LojaPedidos.Application.Pedidos.AlterarPedido;
 using LojaPedidos.Application.Pedidos.AtualizarStatusPedido;
 using LojaPedidos.Application.Pedidos.ConsultarPedido;
 using LojaPedidos.Application.Pedidos.CriarPedido;
+using LojaPedidos.Application.Pedidos.ExcluirPedido;
 using Refit;
 
 namespace LojaPedidos.IntegrationTests.Pedidos;
@@ -25,5 +26,5 @@ public interface IPedidosApi
         AtualizarStatusPedidoRequest request);
 
     [Delete("/api/pedidos/{id}")]
-    Task<HttpResponseMessage> ExcluirAsync(Guid id);
+    Task<ApiResponse<ExcluirPedidoResponse>> ExcluirAsync(Guid id);
 }
