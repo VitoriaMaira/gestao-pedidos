@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Loja Pedidos">
+  <rect width="64" height="64" rx="14" fill="#0f3560"/>
+  <path d="M18 20h28v30H18z" fill="none" stroke="#fff" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M25 16h14v8H25z" fill="#df542a" stroke="#df542a" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M25 32h14M25 40h10" stroke="#df542a" stroke-width="4" stroke-linecap="round"/>
+</svg>

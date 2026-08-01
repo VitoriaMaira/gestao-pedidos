@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LojaPedidos.Api\LojaPedidos.Api.csproj" />
+    <ProjectReference Include="..\LojaPedidos.Web\LojaPedidos.Web.csproj" />
   </ItemGroup>
 
 </Project>

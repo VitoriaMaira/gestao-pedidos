@@ -4,7 +4,7 @@ var sqlServer = builder.AddSqlServer("sqlserver")
     .WithDataVolume();
 var database = sqlServer.AddDatabase("lojapedidos");
 
-builder.AddProject<Projects.LojaPedidos_Api>("api")
+var api = builder.AddProject<Projects.LojaPedidos_Api>("api")
     .WithReference(database)
     .WithEnvironment("ASPNETCORE_ENVIRONMENT", "Development")
     .WithEnvironment("DOTNET_ENVIRONMENT", "Development")
@@ -14,5 +14,15 @@ builder.AddProject<Projects.LojaPedidos_Api>("api")
         DisplayText = "Swagger"
     })
     .WaitFor(database);
+
+builder.AddProject<Projects.LojaPedidos_Web>("web")
+    .WithEnvironment("ASPNETCORE_ENVIRONMENT", "Development")
+    .WithEnvironment("DOTNET_ENVIRONMENT", "Development")
+    .WithUrlForEndpoint("http", endpoint => new()
+    {
+        Url = endpoint.Url,
+        DisplayText = "Loja Pedidos Web"
+    })
+    .WaitFor(api);
 
 builder.Build().Run();
