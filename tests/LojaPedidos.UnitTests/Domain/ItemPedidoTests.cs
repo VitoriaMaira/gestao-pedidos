@@ -41,4 +41,12 @@ public sealed class ItemPedidoTests
 
         Assert.Equal("A quantidade deve ser maior que zero.", excecao.Message);
     }
+
+    [Fact]
+    public void Criar_DeveFalhar_QuandoProdutoForNulo()
+    {
+        var excecao = Assert.Throws<DomainException>(() => new ItemPedido(null!, 1));
+
+        Assert.Equal("O produto é obrigatório.", excecao.Message);
+    }
 }

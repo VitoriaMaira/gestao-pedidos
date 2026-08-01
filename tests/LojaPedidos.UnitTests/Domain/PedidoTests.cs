@@ -38,6 +38,24 @@ public sealed class PedidoTests
     }
 
     [Fact]
+    public void Criar_DeveFalhar_QuandoProdutoForRepetidoNosItens()
+    {
+        var produto = CriarProduto();
+        var itens = new[]
+        {
+            new ItemPedido(produto, 1),
+            new ItemPedido(produto, 2)
+        };
+
+        var excecao = Assert.Throws<DomainException>(
+            () => new Pedido(CriarComprador(), itens));
+
+        Assert.Equal(
+            "O mesmo produto não pode ser adicionado mais de uma vez.",
+            excecao.Message);
+    }
+
+    [Fact]
     public void AlterarQuantidadeItem_DeveAlterarQuantidadeERecalcularTotal()
     {
         var pedido = CriarPedido();
@@ -108,6 +126,67 @@ public sealed class PedidoTests
         Assert.Equal(
             "Apenas pedidos iniciados ou processados podem ser cancelados.",
             excecao.Message);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public void AlterarQuantidadeItem_DeveFalhar_QuandoQuantidadeNaoForPositiva(
+        int quantidade)
+    {
+        var pedido = CriarPedido();
+        var item = Assert.Single(pedido.Itens);
+
+        var excecao = Assert.Throws<DomainException>(
+            () => pedido.AlterarQuantidadeItem(item.Id, quantidade));
+
+        Assert.Equal("A quantidade deve ser maior que zero.", excecao.Message);
+    }
+
+    [Fact]
+    public void Processar_DeveFalhar_QuandoPedidoEstiverCancelado()
+    {
+        var pedido = CriarPedido();
+        pedido.Cancelar();
+
+        var excecao = Assert.Throws<DomainException>(() => pedido.Processar());
+
+        Assert.Equal("Apenas pedidos iniciados podem ser processados.", excecao.Message);
+    }
+
+    [Theory]
+    [InlineData(StatusPedido.Cancelado)]
+    [InlineData(StatusPedido.Enviado)]
+    public void AlterarQuantidadeItem_DeveFalhar_QuandoPedidoEstiverFinalizado(
+        StatusPedido status)
+    {
+        var pedido = CriarPedido();
+        var item = Assert.Single(pedido.Itens);
+
+        if (status == StatusPedido.Enviado)
+        {
+            pedido.Processar();
+            pedido.Enviar();
+        }
+        else
+        {
+            pedido.Cancelar();
+        }
+
+        Assert.Throws<DomainException>(
+            () => pedido.AlterarQuantidadeItem(item.Id, 3));
+    }
+
+    [Fact]
+    public void AlterarStatus_NaoDeveAtualizarData_QuandoStatusJaEstiverDefinido()
+    {
+        var pedido = CriarPedido();
+        pedido.AlterarStatus(StatusPedido.Processado);
+        var atualizadoEm = pedido.AtualizadoEm;
+
+        pedido.AlterarStatus(StatusPedido.Processado);
+
+        Assert.Equal(atualizadoEm, pedido.AtualizadoEm);
     }
 
     [Fact]

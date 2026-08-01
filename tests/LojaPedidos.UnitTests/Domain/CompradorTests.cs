@@ -20,4 +20,15 @@ public sealed class CompradorTests
 
         Assert.Throws<DomainException>(acao);
     }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void Criar_DeveFalhar_QuandoNomeForVazio(string nome)
+    {
+        var acao = () => new Comprador(nome, "12345678909");
+
+        var excecao = Assert.Throws<DomainException>(acao);
+        Assert.Equal("O nome do comprador é obrigatório.", excecao.Message);
+    }
 }

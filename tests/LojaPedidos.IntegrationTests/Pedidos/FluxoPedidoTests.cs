@@ -169,6 +169,40 @@ public sealed class FluxoPedidoTests
         }
     }
 
+    [Fact]
+    public async Task DeveRejeitarEnvioDePedidoCancelado()
+    {
+        var pedido = await CriarPedidoAsync();
+
+        try
+        {
+            await _api.AtualizarStatusAsync(
+                pedido.Id,
+                new AtualizarStatusPedidoRequest(StatusPedido.Cancelado));
+
+            var response = await _api.AtualizarStatusAsync(
+                pedido.Id,
+                new AtualizarStatusPedidoRequest(StatusPedido.Enviado));
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+        finally
+        {
+            await ExcluirPedidoAsync(pedido.Id);
+        }
+    }
+
+    [Fact]
+    public async Task DeveRetornarNotFoundAoConsultarPedidoExcluido()
+    {
+        var pedido = await CriarPedidoAsync();
+
+        await ExcluirPedidoAsync(pedido.Id);
+        var response = await _api.ObterPorIdAsync(pedido.Id);
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
     private async Task<CriarPedidoResponse> CriarPedidoAsync(decimal preco = 150m)
     {
         var request = new CriarPedidoRequest(
@@ -182,6 +216,12 @@ public sealed class FluxoPedidoTests
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         Assert.NotNull(response.Content);
+        var headers = Assert.IsType<System.Net.Http.Headers.HttpResponseHeaders>(
+            response.Headers);
+        var location = Assert.IsType<Uri>(headers.Location);
+        Assert.EndsWith(
+            $"/api/pedidos/{response.Content.Id}",
+            location.OriginalString);
 
         return response.Content;
     }

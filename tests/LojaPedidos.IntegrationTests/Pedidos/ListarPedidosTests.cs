@@ -70,6 +70,16 @@ public sealed class ListarPedidosTests
         }
     }
 
+    [Fact]
+    public async Task DeveRetornarBadRequestQuandoTamanhoDaPaginaForInvalido()
+    {
+        var request = new ListarPedidosRequest(TamanhoPagina: 101);
+
+        var response = await _api.ListarAsync(request);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
     private async Task<CriarPedidoResponse> CriarPedidoAsync()
     {
         var request = new CriarPedidoRequest(

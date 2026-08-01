@@ -24,4 +24,14 @@ public sealed class ProdutoTests
 
         Assert.Equal("O preço do produto deve ser maior que zero.", excecao.Message);
     }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void Criar_DeveFalhar_QuandoNomeForVazio(string nome)
+    {
+        var excecao = Assert.Throws<DomainException>(() => new Produto(nome, 10m));
+
+        Assert.Equal("O nome do produto é obrigatório.", excecao.Message);
+    }
 }
