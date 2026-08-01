@@ -10,7 +10,7 @@ public sealed class PedidosController(CriarPedidoUseCase criarPedidoUseCase) : C
     [HttpPost]
     [ProducesResponseType<CriarPedidoResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> CriarAsync(
+    public async Task<IActionResult> CriarPedidoAsync(
         [FromBody] CriarPedidoRequest request,
         CancellationToken cancellationToken)
     {
