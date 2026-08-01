@@ -1,17 +1,192 @@
-﻿@page "/pedidos/novo"
+@page "/pedidos/novo"
 
 <PageTitle>Novo pedido</PageTitle>
 
-<MudText Typo="Typo.h1" HtmlTag="h1">Novo pedido</MudText>
-<MudText Typo="Typo.body1" Style="color: var(--mud-palette-text-secondary);" Class="mt-2 mb-6">
-    Informe o comprador e os produtos para registrar um pedido.
-</MudText>
+<MudButton Href="/pedidos"
+           Variant="Variant.Text"
+           Color="Color.Primary"
+           StartIcon="@Icons.Material.Outlined.ArrowBack"
+           Class="mb-4">
+    Voltar para pedidos
+</MudButton>
 
-<MudPaper Class="pa-8 text-center" Elevation="0" Outlined="true">
-    <MudIcon Icon="@Icons.Material.Outlined.AddShoppingCart" Size="Size.Large" Color="Color.Secondary" />
-    <MudText Typo="Typo.h4" Class="mt-3">Formulário de criação</MudText>
-    <MudText Typo="Typo.body1" Style="color: var(--mud-palette-text-secondary);" Class="mt-2">
-        O formulário será construído depois da listagem e dos detalhes.
-    </MudText>
-</MudPaper>
+<div class="page-header">
+    <div>
+        <MudText Typo="Typo.h1" HtmlTag="h1">Novo pedido</MudText>
+        <MudText Typo="Typo.body1" Class="secondary-text mt-2">
+            Informe o comprador e os produtos para registrar o pedido completo.
+        </MudText>
+    </div>
+</div>
 
+<MudAlert Severity="Severity.Info"
+          Variant="Variant.Outlined"
+          Icon="@Icons.Material.Outlined.AccountTree"
+          Class="mb-5 creation-info">
+    Se o CPF já estiver cadastrado, a API reutiliza o comprador. O comprador, os produtos,
+    os itens e o pedido são salvos juntos na mesma operação.
+</MudAlert>
+
+@if (_mensagemErro is not null)
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="mb-5">
+        <MudText Typo="Typo.body1">@_mensagemErro</MudText>
+        @if (_errosApi.Count > 0)
+        {
+            <ul class="api-errors">
+                @foreach (var erro in _errosApi)
+                {
+                    <li>@erro</li>
+                }
+            </ul>
+        }
+    </MudAlert>
+}
+
+<MudForm @ref="_form" @bind-IsValid="_formularioValido">
+    <MudPaper Class="form-card pa-5" Elevation="0" Outlined="true">
+        <div class="section-title">
+            <MudIcon Icon="@Icons.Material.Outlined.Person" Color="Color.Secondary" />
+            <div>
+                <MudText Typo="Typo.h6" HtmlTag="h2">Comprador</MudText>
+                <MudText Typo="Typo.body2" Class="secondary-text">Dados de quem está realizando o pedido.</MudText>
+            </div>
+        </div>
+
+        <MudGrid Spacing="3">
+            <MudItem xs="12" md="7">
+                <MudTextField T="string"
+                              @bind-Value="_comprador.Nome"
+                              Label="Nome completo"
+                              Variant="Variant.Outlined"
+                              Required="true"
+                              RequiredError="Informe o nome do comprador."
+                              MaxLength="150"
+                              Counter="150"
+                              Disabled="_salvando" />
+            </MudItem>
+            <MudItem xs="12" md="5">
+                <MudTextField T="string"
+                              @bind-Value="_comprador.Cpf"
+                              Label="CPF"
+                              Placeholder="Somente números"
+                              Variant="Variant.Outlined"
+                              Required="true"
+                              RequiredError="Informe o CPF do comprador."
+                              Validation="@(new Func<string?, string?>(ValidarCpf))"
+                              Mask="_mascaraCpf"
+                              MaxLength="14"
+                              Disabled="_salvando"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Outlined.Badge" />
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+
+    <MudPaper Class="form-card pa-5 mt-5" Elevation="0" Outlined="true">
+        <div class="items-heading">
+            <div class="section-title no-margin">
+                <MudIcon Icon="@Icons.Material.Outlined.Inventory2" Color="Color.Secondary" />
+                <div>
+                    <MudText Typo="Typo.h6" HtmlTag="h2">Produtos</MudText>
+                    <MudText Typo="Typo.body2" Class="secondary-text">Adicione pelo menos um item ao pedido.</MudText>
+                </div>
+            </div>
+            <MudButton Variant="Variant.Outlined"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Outlined.Add"
+                       Disabled="_salvando"
+                       OnClick="AdicionarItem">
+                Adicionar produto
+            </MudButton>
+        </div>
+
+        <div class="items-list">
+            @foreach (var item in _itens)
+            {
+                <MudPaper @key="item.Id" Class="item-card pa-4" Elevation="0" Outlined="true">
+                    <div class="item-number">
+                        <MudText Typo="Typo.subtitle2">Item @(_itens.IndexOf(item) + 1)</MudText>
+                        <MudIconButton Icon="@Icons.Material.Outlined.DeleteOutline"
+                                       Color="Color.Error"
+                                       Size="Size.Small"
+                                       Disabled="_salvando || _itens.Count == 1"
+                                       OnClick="@(() => RemoverItem(item))"
+                                       aria-label="@($"Remover item {_itens.IndexOf(item) + 1}")" />
+                    </div>
+
+                    <MudGrid Spacing="3">
+                        <MudItem xs="12" md="6">
+                            <MudTextField T="string"
+                                          @bind-Value="item.NomeProduto"
+                                          Label="Nome do produto"
+                                          Variant="Variant.Outlined"
+                                          Required="true"
+                                          RequiredError="Informe o nome do produto."
+                                          MaxLength="150"
+                                          Disabled="_salvando" />
+                        </MudItem>
+                        <MudItem xs="12" sm="6" md="3">
+                            <MudNumericField T="decimal?"
+                                             @bind-Value="item.Preco"
+                                             Label="Preço"
+                                             Variant="Variant.Outlined"
+                                             Required="true"
+                                             RequiredError="Informe o preço."
+                                             Min="0.01M"
+                                             Format="N2"
+                                             Culture="@CulturaBrasileira"
+                                             Disabled="_salvando"
+                                             Adornment="Adornment.Start"
+                                             AdornmentText="R$" />
+                        </MudItem>
+                        <MudItem xs="12" sm="6" md="3">
+                            <MudNumericField T="int?"
+                                             @bind-Value="item.Quantidade"
+                                             Label="Quantidade"
+                                             Variant="Variant.Outlined"
+                                             Required="true"
+                                             RequiredError="Informe a quantidade."
+                                             Min="1"
+                                             Disabled="_salvando" />
+                        </MudItem>
+                    </MudGrid>
+                </MudPaper>
+            }
+        </div>
+    </MudPaper>
+
+    <MudPaper Class="order-summary pa-5 mt-5" Elevation="0">
+        <div>
+            <MudText Typo="Typo.subtitle2">Total estimado</MudText>
+            <MudText Typo="Typo.body2" Class="summary-caption">
+                @TextoQuantidadeItens
+            </MudText>
+        </div>
+        <MudText Typo="Typo.h3" HtmlTag="p">@FormatarValor(TotalEstimado)</MudText>
+    </MudPaper>
+
+    <div class="form-actions">
+        <MudButton Href="/pedidos"
+                   Variant="Variant.Text"
+                   Color="Color.Primary"
+                   Disabled="_salvando">
+            Cancelar
+        </MudButton>
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Secondary"
+                   StartIcon="@Icons.Material.Outlined.AddShoppingCart"
+                   Disabled="_salvando"
+                   OnClick="CriarPedidoAsync">
+            @if (_salvando)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                <span>Criando pedido...</span>
+            }
+            else
+            {
+                <span>Criar pedido</span>
+            }
+        </MudButton>
+    </div>
+</MudForm>

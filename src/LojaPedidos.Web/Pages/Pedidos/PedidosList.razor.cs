@@ -1,9 +1,9 @@
 ﻿using System.Globalization;
 using LojaPedidos.Web.Clients.Pedidos;
 using LojaPedidos.Web.Contracts.Pedidos;
+using LojaPedidos.Web.Formatting;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using MudBlazor;
 
 namespace LojaPedidos.Web.Pages.Pedidos;
 
@@ -120,19 +120,10 @@ public partial class PedidosList : IDisposable
     private static string FormatarData(DateTimeOffset data) =>
         data.ToLocalTime().ToString("dd/MM/yyyy HH:mm", CulturaBrasileira);
 
-    private static string FormatarValor(decimal valor) => valor.ToString("C", CulturaBrasileira);
+    private static string FormatarValor(decimal valor) => FormatadorBrasileiro.FormatarMoeda(valor);
 
     private static string FormatarQuantidadeDeItens(int quantidade) =>
         quantidade == 1 ? "1 item" : $"{quantidade} itens";
-
-    private static Color ObterCorDoStatus(StatusPedido status) => status switch
-    {
-        StatusPedido.Iniciado => Color.Info,
-        StatusPedido.Processado => Color.Warning,
-        StatusPedido.Enviado => Color.Success,
-        StatusPedido.Cancelado => Color.Error,
-        _ => Color.Default
-    };
 
     public void Dispose()
     {

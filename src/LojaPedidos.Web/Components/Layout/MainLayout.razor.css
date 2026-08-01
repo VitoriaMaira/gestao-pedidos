@@ -10,10 +10,14 @@
     text-decoration: none;
 }
 
-.brand-symbol {
-    border-radius: 10px;
+.brand-mark {
+    align-items: center;
+    background: var(--lp-accent);
+    border-radius: 12px;
+    color: #fff;
+    display: inline-flex;
     height: 44px;
-    object-fit: cover;
+    justify-content: center;
     width: 44px;
 }
 

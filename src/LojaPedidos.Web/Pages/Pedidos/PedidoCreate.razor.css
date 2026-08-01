@@ -1,0 +1,92 @@
+.page-header {
+    margin-bottom: 1.5rem;
+}
+
+.secondary-text {
+    color: var(--mud-palette-text-secondary);
+}
+
+.form-card {
+    box-shadow: var(--lp-shadow-card);
+}
+
+.section-title,
+.items-heading,
+.item-number,
+.order-summary,
+.form-actions {
+    align-items: center;
+    display: flex;
+}
+
+.section-title {
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.section-title.no-margin {
+    margin-bottom: 0;
+}
+
+.items-heading,
+.item-number,
+.order-summary,
+.form-actions {
+    justify-content: space-between;
+}
+
+.items-heading {
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.items-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.item-card {
+    background: #fafbfc;
+}
+
+.item-number {
+    margin-bottom: 1rem;
+}
+
+.order-summary {
+    background: var(--lp-primary);
+    color: #fff;
+    gap: 1rem;
+}
+
+.order-summary p {
+    margin: 0;
+}
+
+.summary-caption {
+    opacity: 0.78;
+}
+
+.form-actions {
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.api-errors {
+    margin-bottom: 0;
+    padding-left: 1.25rem;
+}
+
+@media (max-width: 600px) {
+    .items-heading,
+    .order-summary,
+    .form-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .items-heading .mud-button-root,
+    .form-actions .mud-button-root {
+        width: 100%;
+    }
+}

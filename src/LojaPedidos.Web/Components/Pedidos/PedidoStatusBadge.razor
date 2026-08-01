@@ -1,0 +1,22 @@
+@using LojaPedidos.Web.Contracts.Pedidos
+
+<MudChip T="string"
+         Size="Size.Small"
+         Variant="Variant.Filled"
+         Color="@Cor">
+    @Status.ToString()
+</MudChip>
+
+@code {
+    [Parameter, EditorRequired]
+    public StatusPedido Status { get; set; }
+
+    private Color Cor => Status switch
+    {
+        StatusPedido.Iniciado => Color.Info,
+        StatusPedido.Processado => Color.Warning,
+        StatusPedido.Enviado => Color.Success,
+        StatusPedido.Cancelado => Color.Error,
+        _ => Color.Default
+    };
+}

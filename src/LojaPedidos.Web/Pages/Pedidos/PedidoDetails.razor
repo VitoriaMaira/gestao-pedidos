@@ -1,0 +1,119 @@
+@page "/pedidos/{Id:guid}"
+@using LojaPedidos.Web.Contracts.Pedidos
+
+<PageTitle>Detalhes do pedido</PageTitle>
+
+<MudButton Href="/pedidos"
+           Variant="Variant.Text"
+           Color="Color.Primary"
+           StartIcon="@Icons.Material.Outlined.ArrowBack"
+           Class="mb-4">
+    Voltar para pedidos
+</MudButton>
+
+@if (_carregando)
+{
+    <MudPaper Class="pa-5 details-card" Elevation="0" Outlined="true" aria-busy="true">
+        <MudSkeleton SkeletonType="SkeletonType.Text" Width="240px" Height="38px" />
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="320px" Class="mt-4" />
+    </MudPaper>
+}
+else if (_mensagemErro is not null)
+{
+    <MudPaper Class="pa-8 text-center details-card" Elevation="0" Outlined="true">
+        <MudIcon Icon="@(_naoEncontrado ? Icons.Material.Outlined.SearchOff : Icons.Material.Outlined.ErrorOutline)"
+                 Size="Size.Large"
+                 Color="Color.Secondary" />
+        <MudText Typo="Typo.h4" HtmlTag="h1" Class="mt-3">
+            @(_naoEncontrado ? "Pedido não encontrado" : "Não foi possível carregar o pedido")
+        </MudText>
+        <MudText Typo="Typo.body1" Class="secondary-text mt-2 mb-4">@_mensagemErro</MudText>
+        @if (!_naoEncontrado)
+        {
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Outlined.Refresh"
+                       OnClick="CarregarPedidoAsync">
+                Tentar novamente
+            </MudButton>
+        }
+    </MudPaper>
+}
+else if (_pedido is not null)
+{
+    <div class="details-header">
+        <div>
+            <MudText Typo="Typo.h1" HtmlTag="h1">Detalhes do pedido</MudText>
+            <MudText Typo="Typo.body1" Class="secondary-text mt-2">
+                Acompanhe os dados e os itens deste pedido.
+            </MudText>
+        </div>
+        <PedidoStatusBadge Status="_pedido.Status" />
+    </div>
+
+    <MudGrid Spacing="3">
+        <MudItem xs="12" md="8">
+            <MudPaper Class="pa-5 details-card" Elevation="0" Outlined="true">
+                <MudText Typo="Typo.h6" HtmlTag="h2" Class="mb-4">Informações do pedido</MudText>
+                <dl class="details-grid">
+                    <div class="full-row">
+                        <dt>Identificador</dt>
+                        <dd class="identifier">@_pedido.Id</dd>
+                    </div>
+                    <div>
+                        <dt>Comprador</dt>
+                        <dd>@_pedido.Comprador</dd>
+                    </div>
+                    <div>
+                        <dt>Data de criação</dt>
+                        <dd>@FormatarData(_pedido.CriadoEm)</dd>
+                    </div>
+                    <div>
+                        <dt>Quantidade de itens</dt>
+                        <dd>@FormatarQuantidade(_pedido.Itens.Count)</dd>
+                    </div>
+                    <div>
+                        <dt>Valor total</dt>
+                        <dd class="total-value">@FormatarValor(_pedido.Total)</dd>
+                    </div>
+                </dl>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" md="4">
+            <MudPaper Class="pa-5 summary-card" Elevation="0">
+                <MudText Typo="Typo.subtitle2">Total do pedido</MudText>
+                <MudText Typo="Typo.h3" HtmlTag="p" Class="mt-2">@FormatarValor(_pedido.Total)</MudText>
+                <MudText Typo="Typo.body2" Class="summary-caption mt-2">
+                    Soma dos subtotais de todos os itens.
+                </MudText>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+
+    <MudPaper Class="items-card mt-6" Elevation="0" Outlined="true">
+        <div class="section-heading">
+            <MudText Typo="Typo.h6" HtmlTag="h2">Itens do pedido</MudText>
+            <MudText Typo="Typo.body2" Class="secondary-text">@FormatarQuantidade(_pedido.Itens.Count)</MudText>
+        </div>
+        <MudTable T="ItemPedidoResponse"
+                  Items="_pedido.Itens"
+                  Hover="true"
+                  Breakpoint="Breakpoint.Sm"
+                  Elevation="0">
+            <HeaderContent>
+                <MudTh>Produto</MudTh>
+                <MudTh>Item ID</MudTh>
+                <MudTh>Quantidade</MudTh>
+                <MudTh Class="text-right">Preço unitário</MudTh>
+                <MudTh Class="text-right">Subtotal</MudTh>
+            </HeaderContent>
+            <RowTemplate Context="item">
+                <MudTd DataLabel="Produto" Class="product-name">@item.Produto</MudTd>
+                <MudTd DataLabel="Item ID"><span class="item-id">@item.Id</span></MudTd>
+                <MudTd DataLabel="Quantidade">@item.Quantidade</MudTd>
+                <MudTd DataLabel="Preço unitário" Class="text-right">@FormatarValor(item.PrecoUnitario)</MudTd>
+                <MudTd DataLabel="Subtotal" Class="text-right subtotal-value">@FormatarValor(item.Subtotal)</MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudPaper>
+}

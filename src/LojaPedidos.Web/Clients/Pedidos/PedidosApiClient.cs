@@ -1,4 +1,4 @@
-﻿using System.Net.Http.Json;
+using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using LojaPedidos.Web.Contracts.Common;
@@ -13,30 +13,69 @@ public sealed class PedidosApiClient(HttpClient httpClient) : IPedidosApiClient
         Converters = { new JsonStringEnumConverter() }
     };
 
-    public async Task<ApiResult<ListarPedidosResponse>> ListarAsync(
+    public Task<ApiResult<CriarPedidoResponse>> CriarAsync(
+        CriarPedidoRequest request,
+        CancellationToken cancellationToken = default) =>
+        EnviarAsync<CriarPedidoResponse>(
+            HttpMethod.Post,
+            "api/pedidos",
+            request,
+            "Não foi possível criar o pedido.",
+            cancellationToken);
+
+    public Task<ApiResult<ListarPedidosResponse>> ListarAsync(
         ListarPedidosQuery query,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default) =>
+        EnviarAsync<ListarPedidosResponse>(
+            HttpMethod.Get,
+            CriarUrlDeListagem(query),
+            null,
+            "Não foi possível consultar os pedidos.",
+            cancellationToken);
+
+    public Task<ApiResult<PedidoResponse>> ObterPorIdAsync(
+        Guid id,
+        CancellationToken cancellationToken = default) =>
+        EnviarAsync<PedidoResponse>(
+            HttpMethod.Get,
+            $"api/pedidos/{id}",
+            null,
+            "Não foi possível consultar o pedido.",
+            cancellationToken);
+
+    private async Task<ApiResult<T>> EnviarAsync<T>(
+        HttpMethod metodo,
+        string url,
+        object? conteudo,
+        string mensagemPadrao,
+        CancellationToken cancellationToken)
     {
         try
         {
-            using var response = await httpClient.GetAsync(
-                CriarUrlDeListagem(query),
-                cancellationToken);
+            using var request = new HttpRequestMessage(metodo, url);
+
+            if (conteudo is not null)
+            {
+                request.Content = JsonContent.Create(conteudo, options: JsonOptions);
+            }
+
+            using var response = await httpClient.SendAsync(request, cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {
-                return await CriarResultadoDeErroAsync(response, cancellationToken);
+                return await CriarResultadoDeErroAsync<T>(
+                    response,
+                    mensagemPadrao,
+                    cancellationToken);
             }
 
-            var dados = await response.Content.ReadFromJsonAsync<ListarPedidosResponse>(
+            var dados = await response.Content.ReadFromJsonAsync<T>(
                 JsonOptions,
                 cancellationToken);
 
             return dados is null
-                ? ApiResult<ListarPedidosResponse>.Falha(
-                    "A API retornou uma resposta vazia.",
-                    response.StatusCode)
-                : ApiResult<ListarPedidosResponse>.Ok(dados);
+                ? ApiResult<T>.Falha("A API retornou uma resposta vazia.", response.StatusCode)
+                : ApiResult<T>.Ok(dados);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
@@ -44,17 +83,17 @@ public sealed class PedidosApiClient(HttpClient httpClient) : IPedidosApiClient
         }
         catch (TaskCanceledException)
         {
-            return ApiResult<ListarPedidosResponse>.Falha(
+            return ApiResult<T>.Falha(
                 "A API demorou mais que o esperado para responder. Tente novamente.");
         }
         catch (HttpRequestException)
         {
-            return ApiResult<ListarPedidosResponse>.Falha(
+            return ApiResult<T>.Falha(
                 "Não foi possível acessar a API. Verifique se o ambiente está em execução e tente novamente.");
         }
         catch (JsonException)
         {
-            return ApiResult<ListarPedidosResponse>.Falha(
+            return ApiResult<T>.Falha(
                 "A resposta recebida da API não pôde ser interpretada.");
         }
     }
@@ -80,8 +119,9 @@ public sealed class PedidosApiClient(HttpClient httpClient) : IPedidosApiClient
         return $"api/pedidos?{string.Join('&', parametros)}";
     }
 
-    private static async Task<ApiResult<ListarPedidosResponse>> CriarResultadoDeErroAsync(
+    private static async Task<ApiResult<T>> CriarResultadoDeErroAsync<T>(
         HttpResponseMessage response,
+        string mensagemPadrao,
         CancellationToken cancellationToken)
     {
         try
@@ -90,20 +130,16 @@ public sealed class PedidosApiClient(HttpClient httpClient) : IPedidosApiClient
                 JsonOptions,
                 cancellationToken);
 
-            var mensagem = problema?.Detail
-                ?? problema?.Title
-                ?? "Não foi possível consultar os pedidos.";
+            var mensagem = problema?.Detail ?? problema?.Title ?? mensagemPadrao;
 
-            return ApiResult<ListarPedidosResponse>.Falha(
+            return ApiResult<T>.Falha(
                 mensagem,
                 response.StatusCode,
                 problema?.Errors);
         }
         catch (JsonException)
         {
-            return ApiResult<ListarPedidosResponse>.Falha(
-                "Não foi possível consultar os pedidos.",
-                response.StatusCode);
+            return ApiResult<T>.Falha(mensagemPadrao, response.StatusCode);
         }
     }
 }
