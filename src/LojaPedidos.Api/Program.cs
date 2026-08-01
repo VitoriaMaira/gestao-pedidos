@@ -1,4 +1,5 @@
 using LojaPedidos.Application;
+using LojaPedidos.Api.Filters;
 using LojaPedidos.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,6 +7,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddControllers(options =>
+    options.Filters.Add<ApiExceptionFilter>());
 
 builder.AddServiceDefaults();
 builder.Services.AddApplication();
@@ -25,5 +28,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapDefaultEndpoints();
+app.MapControllers();
 
 app.Run();
