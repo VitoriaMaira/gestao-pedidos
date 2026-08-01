@@ -86,6 +86,17 @@ public sealed class PedidoTests
     }
 
     [Fact]
+    public void Cancelar_DeveCancelar_QuandoPedidoEstiverIniciado()
+    {
+        var pedido = CriarPedido();
+
+        pedido.Cancelar();
+
+        Assert.Equal(StatusPedido.Cancelado, pedido.Status);
+        Assert.NotNull(pedido.AtualizadoEm);
+    }
+
+    [Fact]
     public void Cancelar_DeveFalhar_QuandoPedidoEstiverEnviado()
     {
         var pedido = CriarPedido();

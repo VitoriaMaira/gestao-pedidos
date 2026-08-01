@@ -1,4 +1,5 @@
 using LojaPedidos.Application.Pedidos.AlterarPedido;
+using LojaPedidos.Application.Pedidos.CancelarPedido;
 using LojaPedidos.Application.Pedidos.ConsultarPedido;
 using LojaPedidos.Application.Pedidos.CriarPedido;
 using LojaPedidos.Application.Pedidos.ExcluirPedido;
@@ -14,7 +15,8 @@ public sealed class PedidosController(
     IObterPedidoPorIdUseCase obterPedidoPorIdUseCase,
     IListarPedidosUseCase listarPedidosUseCase,
     IAlterarPedidoUseCase alterarPedidoUseCase,
-    IExcluirPedidoUseCase excluirPedidoUseCase) : ControllerBase
+    IExcluirPedidoUseCase excluirPedidoUseCase,
+    ICancelarPedidoUseCase cancelarPedidoUseCase) : ControllerBase
 {
     [HttpPost]
     [ProducesResponseType<CriarPedidoResponse>(StatusCodes.Status201Created)]
@@ -82,5 +84,28 @@ public sealed class PedidosController(
         var excluido = await excluirPedidoUseCase.ExecutarAsync(id, cancellationToken);
 
         return excluido ? NoContent() : NotFound();
+    }
+
+    [HttpPost("{id:guid}/cancelar")]
+    [ProducesResponseType<CancelarPedidoResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> CancelarAsync(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var response = await cancelarPedidoUseCase.ExecutarAsync(id, cancellationToken);
+
+        if (response is null)
+        {
+            return NotFound(new ProblemDetails
+            {
+                Status = StatusCodes.Status404NotFound,
+                Title = "Pedido não encontrado.",
+                Detail = "Não foi possível cancelar porque o pedido informado não existe."
+            });
+        }
+
+        return Ok(response);
     }
 }
