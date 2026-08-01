@@ -8,8 +8,6 @@ internal static class PedidosApiClient
 {
     public static IPedidosApi Criar()
     {
-        var baseUrl = Environment.GetEnvironmentVariable("LOJA_PEDIDOS_API_URL")
-            ?? "http://localhost:5080";
         var jsonOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web);
         jsonOptions.Converters.Add(new JsonStringEnumConverter());
 
@@ -18,6 +16,12 @@ internal static class PedidosApiClient
             ContentSerializer = new SystemTextJsonContentSerializer(jsonOptions)
         };
 
-        return RestService.For<IPedidosApi>(baseUrl, settings);
+        return RestService.For<IPedidosApi>(ObterBaseUrl(), settings);
+    }
+
+    public static string ObterBaseUrl()
+    {
+        return Environment.GetEnvironmentVariable("LOJA_PEDIDOS_API_URL")
+            ?? "http://localhost:5080";
     }
 }
