@@ -18,9 +18,7 @@ services:
     restart: unless-stopped
 
   api:
-    build:
-      context: ..
-      dockerfile: src/LojaPedidos.Api/Dockerfile
+    image: ghcr.io/vitoriamaira/gestao-pedidos-api:latest
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       DOTNET_ENVIRONMENT: Development
