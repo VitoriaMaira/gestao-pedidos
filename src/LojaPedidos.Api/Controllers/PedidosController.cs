@@ -1,3 +1,4 @@
+using LojaPedidos.Application.Pedidos.AlterarPedido;
 using LojaPedidos.Application.Pedidos.ConsultarPedido;
 using LojaPedidos.Application.Pedidos.CriarPedido;
 using LojaPedidos.Application.Pedidos.ListarPedidos;
@@ -10,7 +11,8 @@ namespace LojaPedidos.Api.Controllers;
 public sealed class PedidosController(
     ICriarPedidoUseCase criarPedidoUseCase,
     IObterPedidoPorIdUseCase obterPedidoPorIdUseCase,
-    IListarPedidosUseCase listarPedidosUseCase) : ControllerBase
+    IListarPedidosUseCase listarPedidosUseCase,
+    IAlterarPedidoUseCase alterarPedidoUseCase) : ControllerBase
 {
     [HttpPost]
     [ProducesResponseType<CriarPedidoResponse>(StatusCodes.Status201Created)]
@@ -46,5 +48,22 @@ public sealed class PedidosController(
         var response = await listarPedidosUseCase.ExecutarAsync(request, cancellationToken);
 
         return Ok(response);
+    }
+
+    [HttpPut("{id:guid}")]
+    [ProducesResponseType<PedidoResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> AlterarAsync(
+        Guid id,
+        [FromBody] AlterarPedidoRequest request,
+        CancellationToken cancellationToken)
+    {
+        var response = await alterarPedidoUseCase.ExecutarAsync(
+            id,
+            request,
+            cancellationToken);
+
+        return response is null ? NotFound() : Ok(response);
     }
 }
