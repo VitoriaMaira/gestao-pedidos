@@ -10,7 +10,7 @@ public sealed class CriarPedidoUseCase(
     IProdutoRepository produtoRepository,
     IPedidoRepository pedidoRepository,
     IUnitOfWork unitOfWork,
-    IValidator<CriarPedidoRequest> validator)
+    IValidator<CriarPedidoRequest> validator) : ICriarPedidoUseCase
 {
     public async Task<CriarPedidoResponse> ExecutarAsync(
         CriarPedidoRequest request,
