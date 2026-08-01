@@ -1,0 +1,22 @@
+﻿<Router AppAssembly="@typeof(App).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <PageTitle>Página não encontrada</PageTitle>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <MudPaper Class="pa-8 text-center" Elevation="0" Outlined="true">
+                <MudIcon Icon="@Icons.Material.Outlined.SearchOff" Size="Size.Large" Color="Color.Secondary" />
+                <MudText Typo="Typo.h4" Class="mt-3">Página não encontrada</MudText>
+                <MudText Typo="Typo.body1" Style="color: var(--mud-palette-text-secondary);" Class="mt-2 mb-4">
+                    O endereço informado não existe ou não está mais disponível.
+                </MudText>
+                <MudButton Href="/pedidos" Variant="Variant.Filled" Color="Color.Primary">
+                    Voltar para pedidos
+                </MudButton>
+            </MudPaper>
+        </LayoutView>
+    </NotFound>
+</Router>
+

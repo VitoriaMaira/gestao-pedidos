@@ -1,0 +1,46 @@
+﻿@inherits LayoutComponentBase
+
+<AppMudProviders />
+
+<MudLayout>
+    <MudAppBar Class="app-header" Elevation="0" Color="Color.Primary">
+        <a href="/pedidos" class="brand-link" aria-label="Ir para a lista de pedidos">
+            <img src="images/protech-symbol.png" alt="" class="brand-symbol" />
+            <span class="brand-text">
+                <strong>Loja Pedidos</strong>
+                <small>Gestão de pedidos</small>
+            </span>
+        </a>
+
+        <MudSpacer />
+
+        <nav class="main-navigation" aria-label="Navegação principal">
+            <MudButton Href="/pedidos"
+                       Variant="Variant.Text"
+                       Color="Color.Inherit"
+                       StartIcon="@Icons.Material.Outlined.ReceiptLong"
+                       aria-label="Pedidos">
+                <span class="nav-label">Pedidos</span>
+            </MudButton>
+            <MudButton Href="/pedidos/novo"
+                       Variant="Variant.Outlined"
+                       Color="Color.Inherit"
+                       StartIcon="@Icons.Material.Outlined.Add"
+                       aria-label="Novo pedido">
+                <span class="nav-label">Novo pedido</span>
+            </MudButton>
+        </nav>
+    </MudAppBar>
+
+    <MudMainContent Class="app-content">
+        <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="py-8 px-4">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+<div id="blazor-error-ui" data-nosnippet>
+    Ocorreu um erro inesperado.
+    <a href="." class="reload">Recarregar</a>
+    <button type="button" class="dismiss" aria-label="Fechar">×</button>
+</div>

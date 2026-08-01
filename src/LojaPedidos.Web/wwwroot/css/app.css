@@ -1,0 +1,115 @@
+﻿:root {
+    --lp-primary: #0f3560;
+    --lp-accent: #df542a;
+    --lp-background: #f5f7fa;
+    --lp-surface: #ffffff;
+    --lp-text: #1f2937;
+    --lp-border: #d8e0e8;
+    --lp-radius-card: 14px;
+    --lp-shadow-card: 0 8px 24px rgb(15 53 96 / 8%);
+}
+
+html,
+body {
+    background: var(--lp-background);
+    color: var(--lp-text);
+    font-family: "Montserrat", "Segoe UI", Arial, sans-serif;
+    margin: 0;
+    min-height: 100%;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+:focus-visible {
+    outline: 3px solid rgb(223 84 42 / 45%);
+    outline-offset: 2px;
+}
+
+.mud-paper-outlined {
+    border-color: var(--lp-border) !important;
+    border-radius: var(--lp-radius-card) !important;
+}
+
+.app-loading {
+    align-items: center;
+    color: var(--lp-primary);
+    display: flex;
+    flex-direction: column;
+    font-weight: 600;
+    gap: 1rem;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.app-loading img {
+    border-radius: 18px;
+    height: 88px;
+    width: 88px;
+}
+
+.valid.modified:not([type="checkbox"]) {
+    outline: 1px solid var(--mud-palette-success);
+}
+
+.invalid {
+    outline: 1px solid var(--mud-palette-error);
+}
+
+.validation-message {
+    color: var(--mud-palette-error);
+    font-size: 0.85rem;
+}
+
+#blazor-error-ui {
+    background: #fff4e5;
+    border-top: 2px solid var(--lp-accent);
+    bottom: 0;
+    box-shadow: 0 -2px 8px rgb(15 53 96 / 12%);
+    display: none;
+    left: 0;
+    padding: 0.8rem 3rem 0.8rem 1rem;
+    position: fixed;
+    width: 100%;
+    z-index: 2000;
+}
+
+#blazor-error-ui .reload {
+    color: var(--lp-primary);
+    font-weight: 600;
+    margin-left: 0.5rem;
+}
+
+#blazor-error-ui .dismiss {
+    background: transparent;
+    border: 0;
+    color: var(--lp-text);
+    cursor: pointer;
+    font-size: 1.4rem;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.4rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+[tabindex="-1"]:focus {
+    outline: none;
+}
