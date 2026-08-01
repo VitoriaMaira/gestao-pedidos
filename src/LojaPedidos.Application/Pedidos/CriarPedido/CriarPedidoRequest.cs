@@ -3,21 +3,23 @@ using FluentValidation;
 namespace LojaPedidos.Application.Pedidos.CriarPedido;
 
 public sealed record CriarPedidoRequest(
-    Guid CompradorId,
+    CriarCompradorRequest? Comprador,
     IReadOnlyCollection<CriarItemPedidoRequest>? Itens);
-
-public sealed record CriarItemPedidoRequest(
-    Guid ProdutoId,
-    int Quantidade);
 
 public sealed class CriarPedidoRequestValidator
     : AbstractValidator<CriarPedidoRequest>
 {
     public CriarPedidoRequestValidator()
     {
-        RuleFor(request => request.CompradorId)
-            .NotEmpty()
+        RuleFor(request => request.Comprador)
+            .NotNull()
             .WithMessage("O comprador é obrigatório.");
+
+        When(request => request.Comprador is not null, () =>
+        {
+            RuleFor(request => request.Comprador!)
+                .SetValidator(new CriarCompradorRequestValidator());
+        });
 
         RuleFor(request => request.Itens)
             .NotEmpty()
@@ -25,20 +27,5 @@ public sealed class CriarPedidoRequestValidator
 
         RuleForEach(request => request.Itens)
             .SetValidator(new CriarItemPedidoRequestValidator());
-    }
-}
-
-public sealed class CriarItemPedidoRequestValidator
-    : AbstractValidator<CriarItemPedidoRequest>
-{
-    public CriarItemPedidoRequestValidator()
-    {
-        RuleFor(item => item.ProdutoId)
-            .NotEmpty()
-            .WithMessage("O produto é obrigatório.");
-
-        RuleFor(item => item.Quantidade)
-            .GreaterThan(0)
-            .WithMessage("A quantidade deve ser maior que zero.");
     }
 }

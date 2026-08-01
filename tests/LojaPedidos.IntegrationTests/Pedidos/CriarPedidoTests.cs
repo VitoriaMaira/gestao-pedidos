@@ -12,7 +12,7 @@ public sealed class CriarPedidoTests
         var baseUrl = Environment.GetEnvironmentVariable("LOJA_PEDIDOS_API_URL")
             ?? "http://localhost:5080";
         var api = RestService.For<IPedidosApi>(baseUrl);
-        var request = new CriarPedidoRequest(Guid.Empty, []);
+        var request = new CriarPedidoRequest(null, []);
 
         var response = await api.CriarAsync(request);
 

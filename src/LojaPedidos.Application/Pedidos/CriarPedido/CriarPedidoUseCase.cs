@@ -2,6 +2,7 @@ using FluentValidation;
 using LojaPedidos.Domain.Entities;
 using LojaPedidos.Domain.Exceptions;
 using LojaPedidos.Domain.Repositories;
+using LojaPedidos.Domain.ValueObjects;
 
 namespace LojaPedidos.Application.Pedidos.CriarPedido;
 
@@ -18,28 +19,24 @@ public sealed class CriarPedidoUseCase(
     {
         await validator.ValidateAndThrowAsync(request, cancellationToken);
 
-        var comprador = await compradorRepository.ObterPorIdAsync(
-            request.CompradorId,
-            cancellationToken);
+        var cpf = Cpf.Normalizar(request.Comprador!.Cpf);
+        var comprador = await compradorRepository.ObterPorCpfAsync(cpf, cancellationToken);
 
         if (comprador is null)
         {
-            throw new DomainException("Comprador não encontrado.");
+            comprador = new Comprador(request.Comprador.Nome!, cpf);
+            await compradorRepository.AdicionarAsync(comprador, cancellationToken);
         }
 
         var itens = new List<ItemPedido>();
 
         foreach (var itemRequest in request.Itens!)
         {
-            var produto = await produtoRepository.ObterPorIdAsync(
-                itemRequest.ProdutoId,
-                cancellationToken);
+            var produto = new Produto(
+                itemRequest.Produto!.Nome!,
+                itemRequest.Produto.Preco);
 
-            if (produto is null)
-            {
-                throw new DomainException("Produto não encontrado.");
-            }
-
+            await produtoRepository.AdicionarAsync(produto, cancellationToken);
             itens.Add(new ItemPedido(produto, itemRequest.Quantidade));
         }
 
@@ -48,10 +45,6 @@ public sealed class CriarPedidoUseCase(
         await pedidoRepository.AdicionarAsync(pedido, cancellationToken);
         await unitOfWork.CommitAsync(cancellationToken);
 
-        return new CriarPedidoResponse(
-            pedido.Id,
-            pedido.Status,
-            pedido.Total,
-            pedido.CriadoEm);
+        return CriarPedidoResponse.Criar(pedido);
     }
 }
