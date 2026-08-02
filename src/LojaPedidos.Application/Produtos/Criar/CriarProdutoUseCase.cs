@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using LojaPedidos.Application.Common.Exceptions;
 using LojaPedidos.Domain.Entities;
 using LojaPedidos.Domain.Repositories;
 
@@ -21,7 +22,7 @@ public class CriarProdutoUseCase(
         var produtoExiste = await produtoRepository.ObterPorNomeAsync(request.Nome);
 
         if (produtoExiste is not null)
-            throw new ValidationException("O produto já existe.");
+            throw new ErrorOnValidationException(["O produto já existe."]);
 
         var produto = new Produto
         {

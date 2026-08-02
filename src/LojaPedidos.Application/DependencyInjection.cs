@@ -6,6 +6,7 @@ using LojaPedidos.Application.Pedidos.CriarPedido;
 using LojaPedidos.Application.Pedidos.ExcluirPedido;
 using LojaPedidos.Application.Pedidos.ListarPedidos;
 using LojaPedidos.Application.Produtos.Criar;
+using LojaPedidos.Application.Produtos.Listar;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LojaPedidos.Application;
@@ -22,6 +23,7 @@ public static class DependencyInjection
         services.AddScoped<IAtualizarStatusPedidoUseCase, AtualizarStatusPedidoUseCase>();
         services.AddScoped<IExcluirPedidoUseCase, ExcluirPedidoUseCase>();
         services.AddScoped<ICriarProdutoUseCase, CriarProdutoUseCase>();
+        services.AddScoped<IListarProdutosUseCase, ListarProdutosUseCase>();
 
         return services;
     }

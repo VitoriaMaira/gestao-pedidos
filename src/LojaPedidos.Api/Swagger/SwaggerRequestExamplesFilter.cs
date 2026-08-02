@@ -10,6 +10,14 @@ public sealed class SwaggerRequestExamplesFilter : IOperationFilter
 {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
+        ApplyRequestExample(operation, context);
+        ApplyResponseExample(operation, context);
+    }
+
+    private static void ApplyRequestExample(
+        OpenApiOperation operation,
+        OperationFilterContext context)
+    {
         var example = context.MethodInfo.Name switch
         {
             "CriarAsync" => CriarProdutoRequestExample.Value,
@@ -27,6 +35,30 @@ public sealed class SwaggerRequestExamplesFilter : IOperationFilter
         }
 
         foreach (var mediaType in content.Values)
+        {
+            mediaType.Example = JsonNode.Parse(example);
+        }
+    }
+
+    private static void ApplyResponseExample(
+        OpenApiOperation operation,
+        OperationFilterContext context)
+    {
+        var example = (context.MethodInfo.DeclaringType?.Name, context.MethodInfo.Name) switch
+        {
+            ("ProdutosController", "ListarAsync") => ListarProdutosResponseExample.Value,
+            _ => null
+        };
+
+        if (example is null ||
+            operation.Responses is null ||
+            !operation.Responses.TryGetValue("200", out var response) ||
+            response?.Content is null)
+        {
+            return;
+        }
+
+        foreach (var mediaType in response.Content.Values)
         {
             mediaType.Example = JsonNode.Parse(example);
         }

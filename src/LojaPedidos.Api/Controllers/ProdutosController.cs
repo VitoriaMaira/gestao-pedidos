@@ -1,4 +1,5 @@
 using LojaPedidos.Application.Produtos.Criar;
+using LojaPedidos.Application.Produtos.Listar;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -8,6 +9,29 @@ namespace LojaPedidos.Api.Controllers;
 [Route("api/produtos")]
 public sealed class ProdutosController : ControllerBase
 {
+    [HttpGet]
+    [SwaggerOperation(
+        Summary = "Lista os produtos",
+        Description = "Retorna os produtos de forma paginada, ordenados por nome.",
+        OperationId = "ListarProdutos",
+        Tags = ["Produtos"])]
+    [SwaggerResponse(
+        StatusCodes.Status200OK,
+        "Produtos listados com sucesso.",
+        typeof(ListarProdutosResponse))]
+    [SwaggerResponse(
+        StatusCodes.Status400BadRequest,
+        "Parâmetros de paginação inválidos.",
+        typeof(ValidationProblemDetails))]
+    public async Task<IActionResult> ListarAsync(
+        [FromServices] IListarProdutosUseCase useCase,
+        [FromQuery] ListarProdutosQuery request,
+        CancellationToken cancellationToken)
+    {
+        var response = await useCase.ExecutarAsync(request, cancellationToken);
+        return Ok(response);
+    }
+
     [HttpPost]
     [SwaggerOperation(
         Summary = "Cadastra um novo produto",
