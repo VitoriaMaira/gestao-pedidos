@@ -1,5 +1,6 @@
 using LojaPedidos.Application.Produtos.Criar;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace LojaPedidos.Api.Controllers;
 
@@ -7,20 +8,21 @@ namespace LojaPedidos.Api.Controllers;
 [Route("api/produtos")]
 public sealed class ProdutosController : ControllerBase
 {
-    /// <summary>
-    /// Cadastra um novo produto.
-    /// </summary>
-    /// <remarks>
-    /// O nome do produto deve ser único e possuir no máximo 150 caracteres.
-    /// O preço deve ser maior que zero.
-    /// </remarks>
-    /// <param name="useCase">Caso de uso responsável pela criação do produto.</param>
-    /// <param name="request">Nome e preço do produto que será cadastrado.</param>
-    /// <param name="cancellationToken">Token de cancelamento da requisição.</param>
-    /// <returns>O identificador do produto criado.</returns>
     [HttpPost]
-    [ProducesResponseType<CriarProdutoResponse>(StatusCodes.Status201Created)]
-    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [SwaggerOperation(
+        Summary = "Cadastra um novo produto",
+        Description = "O nome deve ser único e possuir no máximo 150 caracteres. " +
+                      "O preço deve ser maior que zero.",
+        OperationId = "CriarProduto",
+        Tags = ["Produtos"])]
+    [SwaggerResponse(
+        StatusCodes.Status201Created,
+        "Produto criado com sucesso.",
+        typeof(CriarProdutoResponse))]
+    [SwaggerResponse(
+        StatusCodes.Status400BadRequest,
+        "Dados inválidos ou produto com nome já cadastrado.",
+        typeof(ValidationProblemDetails))]
     public async Task<IActionResult> CriarAsync(
         [FromServices] ICriarProdutoUseCase useCase,
         [FromBody] CriarProdutoRequest request,

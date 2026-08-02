@@ -1,43 +1,14 @@
-using System.Text.Json.Serialization;
-using LojaPedidos.Application;
+using LojaPedidos.Api.Configurations;
 using LojaPedidos.Api.Filters;
-using LojaPedidos.Api.Swagger;
+using LojaPedidos.Application;
 using LojaPedidos.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
-const string frontendCorsPolicy = "Frontend";
 
-var allowedOrigins = builder.Configuration
-    .GetSection("Cors:AllowedOrigins")
-    .Get<string[]>() ?? [];
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy(frontendCorsPolicy, policy =>
-    {
-        if (allowedOrigins.Length > 0)
-        {
-            policy
-                .WithOrigins(allowedOrigins)
-                .AllowAnyHeader()
-                .AllowAnyMethod();
-        }
-    });
-});
-builder.Services.AddSwaggerGen(options =>
-{
-    options.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "Loja Pedidos API",
-        Version = "v1",
-        Description = "API REST para criação, consulta e gerenciamento de pedidos de uma loja."
-    });
-    options.IncludeXmlComments(typeof(Program).Assembly);
-    options.OperationFilter<SwaggerRequestExamplesFilter>();
-});
+builder.Services.AddSwaggerConfiguration();
+builder.Services.AddCorsConfiguration(builder.Configuration);
 builder.Services
     .AddControllers(options => options.Filters.Add<ApiExceptionFilter>())
     .AddJsonOptions(options =>
@@ -49,14 +20,9 @@ builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 
-app.UseSwagger();
-app.UseSwaggerUI(options =>
-{
-    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Loja Pedidos API v1");
-    options.DocumentTitle = "Loja Pedidos API";
-});
+app.UseSwaggerConfiguration();
 
-app.UseCors(frontendCorsPolicy);
+app.UseCorsConfiguration();
 
 if (app.Environment.IsDevelopment())
 {
