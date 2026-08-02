@@ -1,4 +1,6 @@
 using System.Text.Json.Nodes;
+using LojaPedidos.Api.Swagger.Examples.Pedidos;
+using LojaPedidos.Api.Swagger.Examples.Produtos;
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -10,9 +12,10 @@ public sealed class SwaggerRequestExamplesFilter : IOperationFilter
     {
         var example = context.MethodInfo.Name switch
         {
-            "CriarPedidoAsync" => CriarPedidoExample,
-            "AlterarAsync" => AlterarPedidoExample,
-            "AtualizarStatusAsync" => AtualizarStatusExample,
+            "CriarAsync" => CriarProdutoRequestExample.Value,
+            "CriarPedidoAsync" => CriarPedidoRequestExample.Value,
+            "AlterarAsync" => AlterarPedidoRequestExample.Value,
+            "AtualizarStatusAsync" => AtualizarStatusPedidoRequestExample.Value,
             _ => null
         };
 
@@ -28,39 +31,4 @@ public sealed class SwaggerRequestExamplesFilter : IOperationFilter
             mediaType.Example = JsonNode.Parse(example);
         }
     }
-
-    private const string CriarPedidoExample = """
-        {
-          "comprador": {
-            "nome": "João da Silva",
-            "cpf": "52998224725"
-          },
-          "itens": [
-            {
-              "produto": {
-                "nome": "Teclado mecânico",
-                "preco": 150.00
-              },
-              "quantidade": 1
-            }
-          ]
-        }
-        """;
-
-    private const string AlterarPedidoExample = """
-        {
-          "itens": [
-            {
-              "itemId": "019fbdbf-e925-7260-9976-f61483c85ad4",
-              "quantidade": 2
-            }
-          ]
-        }
-        """;
-
-    private const string AtualizarStatusExample = """
-        {
-          "status": "Processado"
-        }
-        """;
 }
