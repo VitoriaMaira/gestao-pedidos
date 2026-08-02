@@ -1,7 +1,9 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-var sqlServer = builder.AddSqlServer("sqlserver")
-    .WithDataVolume();
+var sqlServer = builder.AddSqlServer("sqlserver", port: 7000)
+     .WithLifetime(ContainerLifetime.Persistent);
+
+
 var database = sqlServer.AddDatabase("lojapedidos");
 
 var api = builder.AddProject<Projects.LojaPedidos_Api>("api")

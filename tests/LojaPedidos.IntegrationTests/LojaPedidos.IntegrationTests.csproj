@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.Testing" Version="13.4.6" />
     <PackageReference Include="coverlet.collector" Version="10.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -22,12 +23,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Using Include="LojaPedidos.Application.Produtos.Criar" />
     <Using Include="Xunit" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\LojaPedidos.Api\LojaPedidos.Api.csproj" />
-    <ProjectReference Include="..\..\src\LojaPedidos.Infrastructure\LojaPedidos.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\LojaPedidos.AppHost\LojaPedidos.AppHost.csproj" />
+    <ProjectReference Include="..\..\src\LojaPedidos.Application\LojaPedidos.Application.csproj" />
   </ItemGroup>
 
 </Project>

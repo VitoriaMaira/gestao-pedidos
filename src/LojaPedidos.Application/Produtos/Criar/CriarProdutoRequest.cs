@@ -1,10 +1,8 @@
-using FluentValidation;
+﻿using FluentValidation;
 
-namespace LojaPedidos.Application.Pedidos.CriarPedido;
+namespace LojaPedidos.Application.Produtos.Criar;
 
-public sealed record CriarProdutoRequest(
-    string? Nome,
-    decimal Preco);
+public sealed record CriarProdutoRequest(string Nome, decimal Preco);
 
 public sealed class CriarProdutoRequestValidator : AbstractValidator<CriarProdutoRequest>
 {

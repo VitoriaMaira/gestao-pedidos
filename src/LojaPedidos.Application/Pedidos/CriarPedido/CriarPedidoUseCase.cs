@@ -33,9 +33,11 @@ public sealed class CriarPedidoUseCase(
 
         foreach (var itemRequest in request.Itens!)
         {
-            var produto = new Produto(
-                itemRequest.Produto!.Nome!,
-                itemRequest.Produto.Preco);
+            var produto = new Produto
+            {
+                Nome = itemRequest.Produto!.Nome!,
+                Preco = itemRequest.Produto.Preco
+            };
 
             await produtoRepository.AdicionarAsync(produto, cancellationToken);
             itens.Add(new ItemPedido(produto, itemRequest.Quantidade));

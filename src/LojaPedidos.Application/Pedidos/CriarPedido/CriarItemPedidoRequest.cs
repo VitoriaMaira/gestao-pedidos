@@ -1,4 +1,5 @@
 using FluentValidation;
+using LojaPedidos.Application.Produtos.Criar;
 
 namespace LojaPedidos.Application.Pedidos.CriarPedido;
 

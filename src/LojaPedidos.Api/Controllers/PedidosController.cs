@@ -10,8 +10,6 @@ namespace LojaPedidos.Api.Controllers;
 
 [ApiController]
 [Route("api/pedidos")]
-[Produces("application/json")]
-[ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError)]
 public sealed class PedidosController(
     ICriarPedidoUseCase criarPedidoUseCase,
     IObterPedidoPorIdUseCase obterPedidoPorIdUseCase,
