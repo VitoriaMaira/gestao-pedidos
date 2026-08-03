@@ -1,5 +1,6 @@
 using LojaPedidos.Domain.Repositories;
-using LojaPedidos.Infrastructure.Repositories;
+using LojaPedidos.Infrastructure.DataAccess;
+using LojaPedidos.Infrastructure.DataAccess.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

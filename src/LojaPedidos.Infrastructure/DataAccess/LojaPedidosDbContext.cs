@@ -1,7 +1,7 @@
 using LojaPedidos.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace LojaPedidos.Infrastructure;
+namespace LojaPedidos.Infrastructure.DataAccess;
 
 public sealed class LojaPedidosDbContext(DbContextOptions<LojaPedidosDbContext> options)
     : DbContext(options)

@@ -1,6 +1,7 @@
 using LojaPedidos.Domain.Repositories;
+using LojaPedidos.Infrastructure.DataAccess;
 
-namespace LojaPedidos.Infrastructure.Repositories;
+namespace LojaPedidos.Infrastructure.DataAccess.Repositories;
 
 public sealed class UnitOfWork(LojaPedidosDbContext dbContext) : IUnitOfWork
 {

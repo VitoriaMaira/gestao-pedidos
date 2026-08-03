@@ -2,9 +2,9 @@ using LojaPedidos.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace LojaPedidos.Infrastructure.Configurations;
+namespace LojaPedidos.Infrastructure.DataAccess.Mappings;
 
-public sealed class PedidoConfiguration : IEntityTypeConfiguration<Pedido>
+public sealed class PedidoMapping : IEntityTypeConfiguration<Pedido>
 {
     public void Configure(EntityTypeBuilder<Pedido> builder)
     {

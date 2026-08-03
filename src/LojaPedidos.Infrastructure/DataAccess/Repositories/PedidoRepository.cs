@@ -1,9 +1,10 @@
 using LojaPedidos.Domain.Entities;
 using LojaPedidos.Domain.Enums;
 using LojaPedidos.Domain.Repositories;
+using LojaPedidos.Infrastructure.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
-namespace LojaPedidos.Infrastructure.Repositories;
+namespace LojaPedidos.Infrastructure.DataAccess.Repositories;
 
 public sealed class PedidoRepository(LojaPedidosDbContext dbContext)
     : RepositoryBase<Pedido>(dbContext), IPedidoRepository

@@ -2,9 +2,9 @@ using LojaPedidos.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace LojaPedidos.Infrastructure.Configurations;
+namespace LojaPedidos.Infrastructure.DataAccess.Mappings;
 
-public sealed class ProdutoConfiguration : IEntityTypeConfiguration<Produto>
+public sealed class ProdutoMapping : IEntityTypeConfiguration<Produto>
 {
     public void Configure(EntityTypeBuilder<Produto> builder)
     {

@@ -1,8 +1,9 @@
 using LojaPedidos.Domain.Entities;
 using LojaPedidos.Domain.Repositories;
+using LojaPedidos.Infrastructure.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
-namespace LojaPedidos.Infrastructure.Repositories;
+namespace LojaPedidos.Infrastructure.DataAccess.Repositories;
 
 public sealed class CompradorRepository(LojaPedidosDbContext dbContext)
     : RepositoryBase<Comprador>(dbContext), ICompradorRepository
