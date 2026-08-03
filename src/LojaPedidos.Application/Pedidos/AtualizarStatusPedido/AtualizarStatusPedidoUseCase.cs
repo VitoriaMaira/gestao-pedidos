@@ -8,10 +8,7 @@ namespace LojaPedidos.Application.Pedidos.AtualizarStatusPedido;
 
 public interface IAtualizarStatusPedidoUseCase
 {
-    Task<AtualizarStatusPedidoResponse> ExecutarAsync(
-        Guid id,
-        AtualizarStatusPedidoRequest request,
-        CancellationToken cancellationToken = default);
+    Task<AtualizarStatusPedidoResponse> Execute(Guid id, AtualizarStatusPedidoRequest request, CancellationToken cancellationToken = default);
 }
 
 public sealed class AtualizarStatusPedidoUseCase(
@@ -20,7 +17,7 @@ public sealed class AtualizarStatusPedidoUseCase(
     IValidator<AtualizarStatusPedidoRequest> validator)
     : IAtualizarStatusPedidoUseCase
 {
-    public async Task<AtualizarStatusPedidoResponse> ExecutarAsync(
+    public async Task<AtualizarStatusPedidoResponse> Execute(
         Guid id,
         AtualizarStatusPedidoRequest request,
         CancellationToken cancellationToken = default)

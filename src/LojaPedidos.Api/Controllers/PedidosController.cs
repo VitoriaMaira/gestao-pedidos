@@ -101,7 +101,7 @@ public sealed class PedidosController(
         [FromBody] AlterarPedidoRequest request,
         CancellationToken cancellationToken)
     {
-        var response = await alterarPedidoUseCase.ExecutarAsync(
+        var response = await alterarPedidoUseCase.Execute(
             id,
             request,
             cancellationToken);
@@ -130,7 +130,7 @@ public sealed class PedidosController(
         [FromBody] AtualizarStatusPedidoRequest request,
         CancellationToken cancellationToken)
     {
-        var response = await atualizarStatusPedidoUseCase.ExecutarAsync(
+        var response = await atualizarStatusPedidoUseCase.Execute(
             id,
             request,
             cancellationToken);

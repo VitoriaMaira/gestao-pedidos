@@ -8,10 +8,7 @@ namespace LojaPedidos.Application.Pedidos.AlterarPedido;
 
 public interface IAlterarPedidoUseCase
 {
-    Task<ConsultarPedidoResponse> ExecutarAsync(
-        Guid id,
-        AlterarPedidoRequest request,
-        CancellationToken cancellationToken = default);
+    Task<ConsultarPedidoResponse> Execute(Guid id, AlterarPedidoRequest request, CancellationToken cancellationToken = default);
 }
 
 public sealed class AlterarPedidoUseCase(
@@ -19,7 +16,7 @@ public sealed class AlterarPedidoUseCase(
     IUnitOfWork unitOfWork,
     IValidator<AlterarPedidoRequest> validator) : IAlterarPedidoUseCase
 {
-    public async Task<ConsultarPedidoResponse> ExecutarAsync(
+    public async Task<ConsultarPedidoResponse> Execute(
         Guid id,
         AlterarPedidoRequest request,
         CancellationToken cancellationToken = default)
