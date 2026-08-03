@@ -1,7 +1,7 @@
 using LojaPedidos.Application.Pedidos.AtualizarStatusPedido;
 using LojaPedidos.Domain.Enums;
 
-namespace LojaPedidos.UnitTests.Application;
+namespace LojaPedidos.UnitTests.Application.Pedidos;
 
 public sealed class AtualizarStatusPedidoRequestValidatorTests
 {

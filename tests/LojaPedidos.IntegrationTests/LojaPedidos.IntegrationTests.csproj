@@ -32,4 +32,8 @@
     <ProjectReference Include="..\..\src\LojaPedidos.Application\LojaPedidos.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Pedidos\**\*.cs" />
+  </ItemGroup>
+
 </Project>

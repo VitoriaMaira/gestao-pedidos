@@ -1,3 +1,4 @@
+using FluentValidation;
 using LojaPedidos.Application.Common.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -8,7 +9,11 @@ public sealed class ApiExceptionFilter : IExceptionFilter
 {
     public void OnException(ExceptionContext context)
     {
-        if (context.Exception is LojaPedidosException)
+        if (context.Exception is ValidationException validationException)
+        {
+            HandleValidationException(context, validationException);
+        }
+        else if (context.Exception is LojaPedidosException)
         {
             HandleProjectException(context);
         }
@@ -16,9 +21,29 @@ public sealed class ApiExceptionFilter : IExceptionFilter
         {
             ThrowUnkowError(context);
         }
+
+        context.ExceptionHandled = true;
     }
 
-    private void HandleProjectException(ExceptionContext context)
+    private static void HandleValidationException(
+        ExceptionContext context,
+        ValidationException exception)
+    {
+        var errors = exception.Errors
+            .GroupBy(error => error.PropertyName)
+            .ToDictionary(
+                group => group.Key,
+                group => group.Select(error => error.ErrorMessage).ToArray());
+
+        context.Result = new BadRequestObjectResult(
+            new ValidationProblemDetails(errors)
+            {
+                Status = StatusCodes.Status400BadRequest,
+                Title = "Existem dados inválidos na requisição."
+            });
+    }
+
+    private static void HandleProjectException(ExceptionContext context)
     {
         var lojaPedidosException = (LojaPedidosException)context.Exception;
         var errorResponse = new ResponseErrorJson(lojaPedidosException.GetErrors());
@@ -27,7 +52,7 @@ public sealed class ApiExceptionFilter : IExceptionFilter
         context.Result = new ObjectResult(errorResponse);
     }
 
-    private void ThrowUnkowError(ExceptionContext context)
+    private static void ThrowUnkowError(ExceptionContext context)
     {
         var errorResponse = new ResponseErrorJson("Erro desconhecido.");
 

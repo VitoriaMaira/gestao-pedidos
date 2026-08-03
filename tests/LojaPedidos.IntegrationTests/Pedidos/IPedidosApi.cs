@@ -4,12 +4,17 @@ using LojaPedidos.Application.Pedidos.ConsultarPedido;
 using LojaPedidos.Application.Pedidos.CriarPedido;
 using LojaPedidos.Application.Pedidos.ExcluirPedido;
 using LojaPedidos.Application.Pedidos.ListarPedidos;
+using LojaPedidos.Application.Produtos.Criar;
 using Refit;
 
 namespace LojaPedidos.IntegrationTests.Pedidos;
 
 public interface IPedidosApi
 {
+    [Post("/api/produtos")]
+    Task<ApiResponse<CriarProdutoResponse>> CriarProdutoAsync(
+        CriarProdutoRequest request);
+
     [Post("/api/pedidos")]
     Task<ApiResponse<CriarPedidoResponse>> CriarAsync(CriarPedidoRequest request);
 

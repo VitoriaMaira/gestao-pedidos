@@ -1,6 +1,7 @@
 using FluentValidation;
 using LojaPedidos.Application.Common.Exceptions;
 using LojaPedidos.Application.Pedidos.ConsultarPedido;
+using LojaPedidos.Domain.Enums;
 using LojaPedidos.Domain.Repositories;
 
 namespace LojaPedidos.Application.Pedidos.AlterarPedido;
@@ -17,19 +18,25 @@ public sealed class AlterarPedidoUseCase(
     {
         await validator.ValidateAndThrowAsync(request, cancellationToken);
 
-        var pedido = await pedidoRepository.ObterPorIdAsync(id, cancellationToken);
+        var pedido = await pedidoRepository.ObterPorId(id, cancellationToken);
 
         if (pedido is null)
-        {
             throw new NotFoundException("Não foi possível encontrar o pedido informado.");
-        }
+
+        if (pedido.Status != StatusPedido.Iniciado)
+            throw new ErrorOnValidationException(["Apenas pedidos não processados podem ser alterados."]);
 
         foreach (var itemRequest in request.Itens!)
         {
-            pedido.AlterarQuantidadeItem(
-                itemRequest.ItemId,
-                itemRequest.Quantidade);
+            var item = pedido.Itens.SingleOrDefault(item => item.Id == itemRequest.ItemId);
+
+            if (item is null)
+                throw new ErrorOnValidationException(["O item informado não pertence ao pedido."]);
+
+            item.AlterarQuantidade(itemRequest.Quantidade);
         }
+
+        pedido.RegistrarAtualizacao();
 
         await unitOfWork.CommitAsync(cancellationToken);
 

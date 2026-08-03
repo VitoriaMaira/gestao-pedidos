@@ -40,7 +40,7 @@ public sealed class ItemPedido : Entity
 
     public decimal Subtotal => PrecoUnitario * Quantidade;
 
-    internal void AlterarQuantidade(int quantidade)
+    public void AlterarQuantidade(int quantidade)
     {
         if (quantidade <= 0)
         {

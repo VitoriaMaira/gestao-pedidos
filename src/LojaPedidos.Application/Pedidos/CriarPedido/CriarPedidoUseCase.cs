@@ -1,10 +1,17 @@
 using FluentValidation;
+using LojaPedidos.Application.Common.Exceptions;
 using LojaPedidos.Domain.Entities;
-using LojaPedidos.Domain.Exceptions;
 using LojaPedidos.Domain.Repositories;
 using LojaPedidos.Domain.ValueObjects;
 
 namespace LojaPedidos.Application.Pedidos.CriarPedido;
+
+public interface ICriarPedidoUseCase
+{
+    Task<CriarPedidoResponse> ExecutarAsync(
+        CriarPedidoRequest request,
+        CancellationToken cancellationToken = default);
+}
 
 public sealed class CriarPedidoUseCase(
     ICompradorRepository compradorRepository,
@@ -19,39 +26,48 @@ public sealed class CriarPedidoUseCase(
     {
         await validator.ValidateAndThrowAsync(request, cancellationToken);
 
-        var cpf = Cpf.Normalizar(request.Comprador!.Cpf);
-        var comprador = await compradorRepository.ObterPorCpfAsync(cpf, cancellationToken);
-        var compradorExistente = comprador is not null;
+        var comprador = await ObterOuCriarComprador(request, cancellationToken);
 
-        if (comprador is null)
-        {
-            comprador = new Comprador(request.Comprador.Nome!, cpf);
-            await compradorRepository.AdicionarAsync(comprador, cancellationToken);
-        }
-
-        var itens = new List<ItemPedido>();
-
-        foreach (var itemRequest in request.Itens!)
-        {
-            var produto = new Produto
-            {
-                Nome = itemRequest.Produto!.Nome!,
-                Preco = itemRequest.Produto.Preco
-            };
-
-            await produtoRepository.AdicionarAsync(produto, cancellationToken);
-            itens.Add(new ItemPedido(produto, itemRequest.Quantidade));
-        }
+        var itens = await CriarItens(request.Itens, cancellationToken);
 
         var pedido = new Pedido(comprador, itens);
 
         await pedidoRepository.AdicionarAsync(pedido, cancellationToken);
         await unitOfWork.CommitAsync(cancellationToken);
 
-        var mensagem = compradorExistente
-            ? "Pedido criado com sucesso. O comprador já cadastrado foi reutilizado."
-            : "Pedido criado com sucesso.";
+        return new CriarPedidoResponse(pedido.Id);
+    }
 
-        return CriarPedidoResponse.Criar(pedido, mensagem);
+    private async Task<Comprador> ObterOuCriarComprador(CriarPedidoRequest request, CancellationToken cancellationToken)
+    {
+        var cpf = Cpf.Normalizar(request.CpfComprador);
+        var comprador = await compradorRepository.ObterPorCpfAsync(
+            cpf,
+            cancellationToken);
+
+        if (comprador is not null)
+            return comprador;
+
+        comprador = new Comprador(request.NomeComprador, cpf);
+        await compradorRepository.AdicionarAsync(comprador, cancellationToken);
+
+        return comprador;
+    }
+
+    private async Task<IReadOnlyCollection<ItemPedido>> CriarItens(IEnumerable<CriarPedidoRequest_ItemPedidoAux> itensRequest, CancellationToken cancellationToken)
+    {
+        var itens = new List<ItemPedido>();
+
+        foreach (var itemRequest in itensRequest)
+        {
+            var produto = await produtoRepository.ObterPorId(itemRequest.Id, cancellationToken);
+
+            if (produto is null)
+                throw new NotFoundException($"Produto com o identificador '{itemRequest.Id}' não encontrado.");
+
+            itens.Add(new ItemPedido(produto, itemRequest.Quantidade));
+        }
+
+        return itens;
     }
 }

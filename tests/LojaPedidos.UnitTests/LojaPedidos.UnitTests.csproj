@@ -29,4 +29,9 @@
     <ProjectReference Include="..\..\src\LojaPedidos.Domain\LojaPedidos.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Application\Pedidos\" />
+    <Folder Include="Application\Produtos\" />
+  </ItemGroup>
+
 </Project>

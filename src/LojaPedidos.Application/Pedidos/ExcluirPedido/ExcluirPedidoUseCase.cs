@@ -11,7 +11,9 @@ public sealed class ExcluirPedidoUseCase(
         Guid id,
          CancellationToken cancellationToken = default)
     {
-        var pedido = await pedidoRepository.ObterPorIdAsync(id, cancellationToken);
+        var pedido = await pedidoRepository.ObterParaExclusaoAsync(
+            id,
+            cancellationToken);
 
         if (pedido is null)
         {

@@ -8,9 +8,11 @@ public class RepositoryBase<TEntity>(LojaPedidosDbContext dbContext)
     : IRepositoryBase<TEntity>
    where TEntity : Entity
 {
+    protected LojaPedidosDbContext DbContext { get; } = dbContext;
+
     protected DbSet<TEntity> DbSet { get; } = dbContext.Set<TEntity>();
 
-    public virtual async Task<TEntity?> ObterPorIdAsync(
+    public virtual async Task<TEntity?> ObterPorId(
         Guid id,
         CancellationToken cancellationToken = default)
     {
@@ -29,7 +31,7 @@ public class RepositoryBase<TEntity>(LojaPedidosDbContext dbContext)
         DbSet.Update(entity);
     }
 
-    public void Remover(TEntity entity)
+    public virtual void Remover(TEntity entity)
     {
         DbSet.Remove(entity);
     }

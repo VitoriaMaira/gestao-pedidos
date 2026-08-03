@@ -1,5 +1,7 @@
 using System.Net;
 using LojaPedidos.Application.Pedidos.CriarPedido;
+using LojaPedidos.Application.Pedidos.ConsultarPedido;
+using LojaPedidos.Application.Produtos.Criar;
 
 namespace LojaPedidos.IntegrationTests.Pedidos;
 
@@ -10,7 +12,7 @@ public sealed class CriarPedidoTests
     [Fact]
     public async Task DeveRetornarBadRequestQuandoPedidoForInvalido()
     {
-        var request = new CriarPedidoRequest(null, []);
+        var request = new CriarPedidoRequest(string.Empty, string.Empty, []);
 
         var response = await _api.CriarAsync(request);
 
@@ -26,9 +28,8 @@ public sealed class CriarPedidoTests
 
         try
         {
-            Assert.Equal(primeiroPedido.Comprador.Id, segundoPedido.Comprador.Id);
-            Assert.Equal("Primeiro nome", segundoPedido.Comprador.Nome);
-            Assert.Contains("reutilizado", segundoPedido.Mensagem);
+            Assert.Equal(primeiroPedido.CompradorId, segundoPedido.CompradorId);
+            Assert.Equal("Primeiro nome", segundoPedido.Comprador);
         }
         finally
         {
@@ -37,20 +38,24 @@ public sealed class CriarPedidoTests
         }
     }
 
-    private async Task<CriarPedidoResponse> CriarPedidoAsync(string comprador, string cpf)
+    private async Task<PedidoResponse> CriarPedidoAsync(string comprador, string cpf)
     {
+        var produtoResponse = await _api.CriarProdutoAsync(
+            new CriarProdutoRequest($"Produto {Guid.CreateVersion7()}", 100m));
+        Assert.Equal(HttpStatusCode.Created, produtoResponse.StatusCode);
+        var produto = Assert.IsType<CriarProdutoResponse>(produtoResponse.Content);
+
         var request = new CriarPedidoRequest(
-            new CriarCompradorRequest(comprador, cpf),
-            [
-                new CriarItemPedidoRequest(
-                    new CriarProdutoRequest($"Produto {Guid.CreateVersion7()}", 100m),
-                    1)
-            ]);
+            comprador,
+            cpf,
+            [new CriarPedidoRequest_ItemPedidoAux(produto.Id, 1)]);
         var response = await _api.CriarAsync(request);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         Assert.NotNull(response.Content);
 
-        return response.Content;
+        var consulta = await _api.ObterPorIdAsync(response.Content.Id);
+        Assert.Equal(HttpStatusCode.OK, consulta.StatusCode);
+        return Assert.IsType<PedidoResponse>(consulta.Content);
     }
 }

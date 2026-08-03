@@ -2,6 +2,8 @@ using System.Net;
 using LojaPedidos.Application.Pedidos.AlterarPedido;
 using LojaPedidos.Application.Pedidos.AtualizarStatusPedido;
 using LojaPedidos.Application.Pedidos.CriarPedido;
+using LojaPedidos.Application.Pedidos.ConsultarPedido;
+using LojaPedidos.Application.Produtos.Criar;
 using LojaPedidos.Domain.Enums;
 
 namespace LojaPedidos.IntegrationTests.Pedidos;
@@ -203,15 +205,17 @@ public sealed class FluxoPedidoTests
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
-    private async Task<CriarPedidoResponse> CriarPedidoAsync(decimal preco = 150m)
+    private async Task<PedidoResponse> CriarPedidoAsync(decimal preco = 150m)
     {
+        var produtoResponse = await _api.CriarProdutoAsync(
+            new CriarProdutoRequest($"Produto {Guid.CreateVersion7()}", preco));
+        Assert.Equal(HttpStatusCode.Created, produtoResponse.StatusCode);
+        var produto = Assert.IsType<CriarProdutoResponse>(produtoResponse.Content);
+
         var request = new CriarPedidoRequest(
-            new CriarCompradorRequest("Comprador dos testes", "12345678909"),
-            [
-                new CriarItemPedidoRequest(
-                    new CriarProdutoRequest($"Produto {Guid.CreateVersion7()}", preco),
-                    1)
-            ]);
+            "Comprador dos testes",
+            "12345678909",
+            [new CriarPedidoRequest_ItemPedidoAux(produto.Id, 1)]);
         var response = await _api.CriarAsync(request);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
@@ -223,7 +227,9 @@ public sealed class FluxoPedidoTests
             $"/api/pedidos/{response.Content.Id}",
             location.OriginalString);
 
-        return response.Content;
+        var consulta = await _api.ObterPorIdAsync(response.Content.Id);
+        Assert.Equal(HttpStatusCode.OK, consulta.StatusCode);
+        return Assert.IsType<PedidoResponse>(consulta.Content);
     }
 
     private async Task ExcluirPedidoAsync(Guid id)

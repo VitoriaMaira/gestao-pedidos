@@ -1,6 +1,7 @@
 using System.Net;
 using LojaPedidos.Application.Pedidos.CriarPedido;
 using LojaPedidos.Application.Pedidos.ListarPedidos;
+using LojaPedidos.Application.Produtos.Criar;
 using LojaPedidos.IntegrationTests.Configurations;
 
 namespace LojaPedidos.IntegrationTests.Features.Pedidos;
@@ -60,7 +61,8 @@ public sealed class PedidosTests(AspireAppFixture fixture)
     public async Task DeveRejeitarPedidoSemItens()
     {
         var request = new CriarPedidoRequest(
-            new CriarCompradorRequest("Comprador dos testes", CpfValido),
+            "Comprador dos testes",
+            CpfValido,
             []);
 
         var response = await fixture.Api.Pedidos.CriarAsync(request);
@@ -71,15 +73,18 @@ public sealed class PedidosTests(AspireAppFixture fixture)
 
     private async Task<CriarPedidoResponse> CriarPedidoAsync()
     {
+        var produtoResponse = await fixture.Api.Produtos.CriarAsync(
+            new CriarProdutoRequest(
+                $"Produto de pedido {Guid.CreateVersion7()}",
+                79.90m));
+
+        Assert.Equal(HttpStatusCode.Created, produtoResponse.StatusCode);
+        var produto = Assert.IsType<CriarProdutoResponse>(produtoResponse.Content);
+
         var request = new CriarPedidoRequest(
-            new CriarCompradorRequest("Comprador dos testes", CpfValido),
-            [
-                new CriarItemPedidoRequest(
-                    new CriarProdutoRequest(
-                        $"Produto de pedido {Guid.CreateVersion7()}",
-                        79.90m),
-                    2)
-            ]);
+            "Comprador dos testes",
+            CpfValido,
+            [new CriarPedidoRequest_ItemPedidoAux(produto.Id, 2)]);
 
         var response = await fixture.Api.Pedidos.CriarAsync(request);
 

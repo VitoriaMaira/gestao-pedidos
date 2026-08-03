@@ -4,16 +4,11 @@ internal static class CriarPedidoRequestExample
 {
     public const string Value = """
         {
-          "comprador": {
-            "nome": "João da Silva",
-            "cpf": "52998224725"
-          },
+          "nomeComprador": "João da Silva",
+          "cpfComprador": "52998224725",
           "itens": [
             {
-              "produto": {
-                "nome": "Teclado mecânico",
-                "preco": 150.00
-              },
+              "id": "019fbdbf-e925-7260-9976-f61483c85ad4",
               "quantidade": 1
             }
           ]

@@ -10,7 +10,7 @@ public sealed class ObterPedidoPorIdUseCase(IPedidoRepository pedidoRepository)
         Guid id,
         CancellationToken cancellationToken = default)
     {
-        var pedido = await pedidoRepository.ObterPorIdAsync(id, cancellationToken);
+        var pedido = await pedidoRepository.ObterPorId(id, cancellationToken);
 
         if (pedido is null)
         {

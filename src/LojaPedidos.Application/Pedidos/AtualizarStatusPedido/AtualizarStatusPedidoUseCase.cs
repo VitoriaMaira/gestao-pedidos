@@ -1,6 +1,7 @@
 using FluentValidation;
 using LojaPedidos.Application.Common.Exceptions;
 using LojaPedidos.Application.Pedidos.ConsultarPedido;
+using LojaPedidos.Domain.Enums;
 using LojaPedidos.Domain.Repositories;
 
 namespace LojaPedidos.Application.Pedidos.AtualizarStatusPedido;
@@ -18,7 +19,7 @@ public sealed class AtualizarStatusPedidoUseCase(
     {
         await validator.ValidateAndThrowAsync(request, cancellationToken);
 
-        var pedido = await pedidoRepository.ObterPorIdAsync(id, cancellationToken);
+        var pedido = await pedidoRepository.ObterPorId(id, cancellationToken);
 
         if (pedido is null)
         {
@@ -27,7 +28,17 @@ public sealed class AtualizarStatusPedidoUseCase(
 
         var statusJaDefinido = pedido.Status == request.Status;
 
-        pedido.AlterarStatus(request.Status);
+        if (!statusJaDefinido && !TransicaoPermitida(pedido.Status, request.Status))
+        {
+            throw new ErrorOnValidationException(
+                [$"Não é permitido alterar o status de {pedido.Status} para {request.Status}."]);
+        }
+
+        if (!statusJaDefinido)
+        {
+            pedido.DefinirStatus(request.Status);
+        }
+
         await unitOfWork.CommitAsync(cancellationToken);
 
         var mensagem = statusJaDefinido
@@ -37,5 +48,19 @@ public sealed class AtualizarStatusPedidoUseCase(
         return new AtualizarStatusPedidoResponse(
             mensagem,
             PedidoResponse.Criar(pedido));
+    }
+
+    private static bool TransicaoPermitida(
+        StatusPedido statusAtual,
+        StatusPedido novoStatus)
+    {
+        return (statusAtual, novoStatus) switch
+        {
+            (StatusPedido.Iniciado, StatusPedido.Processado) => true,
+            (StatusPedido.Iniciado, StatusPedido.Cancelado) => true,
+            (StatusPedido.Processado, StatusPedido.Enviado) => true,
+            (StatusPedido.Processado, StatusPedido.Cancelado) => true,
+            _ => false
+        };
     }
 }

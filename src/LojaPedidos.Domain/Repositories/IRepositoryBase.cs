@@ -5,7 +5,7 @@ namespace LojaPedidos.Domain.Repositories;
 public interface IRepositoryBase<TEntity>
     where TEntity : Entity
 {
-    Task<TEntity?> ObterPorIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<TEntity?> ObterPorId(Guid id, CancellationToken cancellationToken = default);
 
     Task AdicionarAsync(TEntity entity, CancellationToken cancellationToken = default);
 

@@ -1,6 +1,6 @@
 using LojaPedidos.Application.Pedidos.AlterarPedido;
 
-namespace LojaPedidos.UnitTests.Application;
+namespace LojaPedidos.UnitTests.Application.Pedidos;
 
 public sealed class AlterarPedidoRequestValidatorTests
 {
@@ -17,16 +17,30 @@ public sealed class AlterarPedidoRequestValidatorTests
         Assert.True(resultado.IsValid);
     }
 
-    [Fact]
-    public async Task Validar_DeveFalhar_QuandoItemForInvalido()
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public async Task Validar_DeveFalhar_QuandoItemForInvalido(int quantidade)
     {
         var request = new AlterarPedidoRequest(
-            [new AlterarItemPedidoRequest(Guid.Empty, 0)]);
+            [new AlterarItemPedidoRequest(Guid.Empty, quantidade)]);
 
         var resultado = await _validator.ValidateAsync(request);
 
         Assert.Contains(resultado.Errors, erro => erro.PropertyName == "Itens[0].ItemId");
         Assert.Contains(resultado.Errors, erro => erro.PropertyName == "Itens[0].Quantidade");
+    }
+
+    [Fact]
+    public async Task Validar_DeveFalhar_QuandoItensEstiveremVazios()
+    {
+        var request = new AlterarPedidoRequest([]);
+
+        var resultado = await _validator.ValidateAsync(request);
+
+        Assert.Contains(
+            resultado.Errors,
+            erro => erro.PropertyName == nameof(AlterarPedidoRequest.Itens));
     }
 
     [Fact]

@@ -2,6 +2,7 @@ using System.Net;
 using LojaPedidos.Application.Pedidos.AtualizarStatusPedido;
 using LojaPedidos.Application.Pedidos.CriarPedido;
 using LojaPedidos.Application.Pedidos.ListarPedidos;
+using LojaPedidos.Application.Produtos.Criar;
 using LojaPedidos.Domain.Enums;
 
 namespace LojaPedidos.IntegrationTests.Pedidos;
@@ -82,13 +83,15 @@ public sealed class ListarPedidosTests
 
     private async Task<CriarPedidoResponse> CriarPedidoAsync()
     {
+        var produtoResponse = await _api.CriarProdutoAsync(
+            new CriarProdutoRequest($"Produto {Guid.CreateVersion7()}", 100m));
+        Assert.Equal(HttpStatusCode.Created, produtoResponse.StatusCode);
+        var produto = Assert.IsType<CriarProdutoResponse>(produtoResponse.Content);
+
         var request = new CriarPedidoRequest(
-            new CriarCompradorRequest("Comprador da listagem", CpfComprador),
-            [
-                new CriarItemPedidoRequest(
-                    new CriarProdutoRequest($"Produto {Guid.CreateVersion7()}", 100m),
-                    1)
-            ]);
+            "Comprador da listagem",
+            CpfComprador,
+            [new CriarPedidoRequest_ItemPedidoAux(produto.Id, 1)]);
         var response = await _api.CriarAsync(request);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);

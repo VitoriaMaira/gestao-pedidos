@@ -1,6 +1,6 @@
 using LojaPedidos.Application.Pedidos.ListarPedidos;
 
-namespace LojaPedidos.UnitTests.Application;
+namespace LojaPedidos.UnitTests.Application.Pedidos;
 
 public sealed class ListarPedidosRequestValidatorTests
 {
@@ -26,5 +26,23 @@ public sealed class ListarPedidosRequestValidatorTests
         Assert.Contains(
             resultado.Errors,
             erro => erro.PropertyName == nameof(ListarPedidosRequest.Cpf));
+    }
+
+    [Theory]
+    [InlineData(0, 10, nameof(ListarPedidosRequest.Pagina))]
+    [InlineData(1, 0, nameof(ListarPedidosRequest.TamanhoPagina))]
+    [InlineData(1, 101, nameof(ListarPedidosRequest.TamanhoPagina))]
+    public async Task Validar_DeveFalhar_QuandoPaginacaoForInvalida(
+        int pagina,
+        int tamanhoPagina,
+        string propriedadeInvalida)
+    {
+        var request = new ListarPedidosRequest(pagina, tamanhoPagina);
+
+        var resultado = await _validator.ValidateAsync(request);
+
+        Assert.Contains(
+            resultado.Errors,
+            erro => erro.PropertyName == propriedadeInvalida);
     }
 }
