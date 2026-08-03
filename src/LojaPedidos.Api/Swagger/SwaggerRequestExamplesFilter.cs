@@ -47,6 +47,9 @@ public sealed class SwaggerRequestExamplesFilter : IOperationFilter
         var example = (context.MethodInfo.DeclaringType?.Name, context.MethodInfo.Name) switch
         {
             ("ProdutosController", "ListarAsync") => ListarProdutosResponseExample.Value,
+            ("PedidosController", "ConsultarPorId") => ConsultarPedidoResponseExample.Value,
+            ("PedidosController", "ListarAsync") => ListarPedidosResponseExample.Value,
+            ("PedidosController", "ExcluirAsync") => ExcluirPedidoResponseExample.Value,
             _ => null
         };
 

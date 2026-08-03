@@ -30,9 +30,7 @@ public sealed class ProdutosController : ControllerBase
         CancellationToken cancellationToken)
     {
         var response = await useCase.ExecutarAsync(request, cancellationToken);
-        return Ok(ApiResponse<ListarProdutosResponse>.Ok(
-            "Produtos listados com sucesso.",
-            response));
+        return Ok(ApiResponse<ListarProdutosResponse>.Ok("Produtos listados com sucesso.", response));
     }
 
     [HttpPost]
@@ -56,10 +54,6 @@ public sealed class ProdutosController : ControllerBase
         CancellationToken cancellationToken)
     {
         var response = await useCase.Execute(request, cancellationToken);
-        return Created(
-            $"/api/produtos/{response.Id}",
-            ApiResponse<CriarProdutoResponse>.Ok(
-                "Produto criado com sucesso.",
-                response));
+        return Created($"/api/produtos/{response.Id}", ApiResponse<CriarProdutoResponse>.Ok("Produto criado com sucesso.", response));
     }
 }

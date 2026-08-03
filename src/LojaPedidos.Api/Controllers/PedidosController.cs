@@ -6,6 +6,7 @@ using LojaPedidos.Application.Pedidos.CriarPedido;
 using LojaPedidos.Application.Pedidos.ExcluirPedido;
 using LojaPedidos.Application.Pedidos.ListarPedidos;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace LojaPedidos.Api.Controllers;
 
@@ -19,18 +20,25 @@ public sealed class PedidosController(
     IAtualizarStatusPedidoUseCase atualizarStatusPedidoUseCase,
     IExcluirPedidoUseCase excluirPedidoUseCase) : ControllerBase
 {
-    /// <summary>
-    /// Cria um pedido com os dados do comprador e dos produtos.
-    /// </summary>
-    /// <remarks>
-    /// Se o CPF já estiver cadastrado, o comprador existente será reutilizado.
-    /// O pedido é criado com o status Iniciado.
-    /// </remarks>
-    /// <param name="request">Dados do comprador e dos itens do pedido.</param>
-    /// <param name="cancellationToken">Token de cancelamento da requisição.</param>
     [HttpPost]
-    [ProducesResponseType<ApiResponse<CriarPedidoResponse>>(StatusCodes.Status201Created)]
-    [ProducesResponseType<ApiResponse<object>>(StatusCodes.Status400BadRequest)]
+    [SwaggerOperation(
+        Summary = "Cria um novo pedido",
+        Description = "Cria o pedido com status Iniciado. Se o CPF já estiver cadastrado, " +
+                      "o comprador existente será reutilizado.",
+        OperationId = "CriarPedido",
+        Tags = ["Pedidos"])]
+    [SwaggerResponse(
+        StatusCodes.Status201Created,
+        "Pedido criado com sucesso.",
+        typeof(ApiResponse<CriarPedidoResponse>))]
+    [SwaggerResponse(
+        StatusCodes.Status400BadRequest,
+        "Dados do comprador ou dos itens inválidos.",
+        typeof(ApiResponse<object>))]
+    [SwaggerResponse(
+        StatusCodes.Status404NotFound,
+        "Um dos produtos informados não foi encontrado.",
+        typeof(ApiResponse<object>))]
     public async Task<IActionResult> CriarPedidoAsync(
         [FromBody] CriarPedidoRequest request,
         CancellationToken cancellationToken)
@@ -45,14 +53,21 @@ public sealed class PedidosController(
                 response));
     }
 
-    /// <summary>
-    /// Busca um pedido pelo identificador.
-    /// </summary>
-    /// <param name="id">Identificador do pedido.</param>
-    /// <param name="cancellationToken">Token de cancelamento da requisição.</param>
+
     [HttpGet("{id:guid}")]
-    [ProducesResponseType<ApiResponse<ConsultarPedidoResponse>>(StatusCodes.Status200OK)]
-    [ProducesResponseType<ApiResponse<object>>(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(
+        Summary = "Consulta um pedido",
+        Description = "Retorna os dados do pedido, do comprador e de seus itens.",
+        OperationId = "ConsultarPedido",
+        Tags = ["Pedidos"])]
+    [SwaggerResponse(
+        StatusCodes.Status200OK,
+        "Pedido consultado com sucesso.",
+        typeof(ApiResponse<ConsultarPedidoResponse>))]
+    [SwaggerResponse(
+        StatusCodes.Status404NotFound,
+        "Pedido não encontrado.",
+        typeof(ApiResponse<object>))]
     public async Task<IActionResult> ConsultarPorId(
         Guid id,
         CancellationToken cancellationToken)
@@ -64,17 +79,21 @@ public sealed class PedidosController(
             response));
     }
 
-    /// <summary>
-    /// Lista os pedidos de forma paginada.
-    /// </summary>
-    /// <remarks>
-    /// Os filtros de status e CPF são opcionais. O tamanho máximo da página é 100.
-    /// </remarks>
-    /// <param name="request">Paginação e filtros opcionais da consulta.</param>
-    /// <param name="cancellationToken">Token de cancelamento da requisição.</param>
+
     [HttpGet]
-    [ProducesResponseType<ApiResponse<ListarPedidosResponse>>(StatusCodes.Status200OK)]
-    [ProducesResponseType<ApiResponse<object>>(StatusCodes.Status400BadRequest)]
+    [SwaggerOperation(
+        Summary = "Lista os pedidos",
+        Description = "Retorna os pedidos de forma paginada. Os filtros por status e CPF são opcionais.",
+        OperationId = "ListarPedidos",
+        Tags = ["Pedidos"])]
+    [SwaggerResponse(
+        StatusCodes.Status200OK,
+        "Pedidos listados com sucesso.",
+        typeof(ApiResponse<ListarPedidosResponse>))]
+    [SwaggerResponse(
+        StatusCodes.Status400BadRequest,
+        "Parâmetros de paginação ou filtros inválidos.",
+        typeof(ApiResponse<object>))]
     public async Task<IActionResult> ListarAsync(
         [FromQuery] ListarPedidosRequest request,
         CancellationToken cancellationToken)
@@ -86,16 +105,24 @@ public sealed class PedidosController(
             response));
     }
 
-    /// <summary>
-    /// Altera as quantidades dos itens de um pedido iniciado.
-    /// </summary>
-    /// <param name="id">Identificador do pedido.</param>
-    /// <param name="request">Itens e novas quantidades.</param>
-    /// <param name="cancellationToken">Token de cancelamento da requisição.</param>
     [HttpPut("{id:guid}")]
-    [ProducesResponseType<ApiResponse<ConsultarPedidoResponse>>(StatusCodes.Status200OK)]
-    [ProducesResponseType<ApiResponse<object>>(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType<ApiResponse<object>>(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(
+        Summary = "Altera um pedido",
+        Description = "Altera as quantidades dos itens de um pedido com status Iniciado.",
+        OperationId = "AlterarPedido",
+        Tags = ["Pedidos"])]
+    [SwaggerResponse(
+        StatusCodes.Status200OK,
+        "Pedido atualizado com sucesso.",
+        typeof(ApiResponse<ConsultarPedidoResponse>))]
+    [SwaggerResponse(
+        StatusCodes.Status400BadRequest,
+        "Itens inválidos ou pedido em um status que não permite alteração.",
+        typeof(ApiResponse<object>))]
+    [SwaggerResponse(
+        StatusCodes.Status404NotFound,
+        "Pedido não encontrado.",
+        typeof(ApiResponse<object>))]
     public async Task<IActionResult> AlterarAsync(
         Guid id,
         [FromBody] AlterarPedidoRequest request,
@@ -111,20 +138,24 @@ public sealed class PedidosController(
             response));
     }
 
-    /// <summary>
-    /// Atualiza o status do pedido respeitando as transições permitidas.
-    /// </summary>
-    /// <remarks>
-    /// Um pedido iniciado pode ser processado ou cancelado. Um pedido processado
-    /// pode ser enviado ou cancelado.
-    /// </remarks>
-    /// <param name="id">Identificador do pedido.</param>
-    /// <param name="request">Novo status do pedido.</param>
-    /// <param name="cancellationToken">Token de cancelamento da requisição.</param>
     [HttpPut("{id:guid}/status")]
-    [ProducesResponseType<ApiResponse<AtualizarStatusPedidoResponse>>(StatusCodes.Status200OK)]
-    [ProducesResponseType<ApiResponse<object>>(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType<ApiResponse<object>>(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(
+        Summary = "Atualiza o status de um pedido",
+        Description = "Atualiza o status respeitando as transições permitidas para o pedido.",
+        OperationId = "AtualizarStatusPedido",
+        Tags = ["Pedidos"])]
+    [SwaggerResponse(
+        StatusCodes.Status200OK,
+        "Status do pedido atualizado com sucesso.",
+        typeof(ApiResponse<AtualizarStatusPedidoResponse>))]
+    [SwaggerResponse(
+        StatusCodes.Status400BadRequest,
+        "Status inválido ou transição de status não permitida.",
+        typeof(ApiResponse<object>))]
+    [SwaggerResponse(
+        StatusCodes.Status404NotFound,
+        "Pedido não encontrado.",
+        typeof(ApiResponse<object>))]
     public async Task<IActionResult> AtualizarStatusAsync(
         Guid id,
         [FromBody] AtualizarStatusPedidoRequest request,
@@ -140,17 +171,20 @@ public sealed class PedidosController(
             response));
     }
 
-    /// <summary>
-    /// Realiza a exclusão lógica de um pedido.
-    /// </summary>
-    /// <remarks>
-    /// O pedido não é removido do banco de dados; seu status é alterado para Cancelado.
-    /// </remarks>
-    /// <param name="id">Identificador do pedido.</param>
-    /// <param name="cancellationToken">Token de cancelamento da requisição.</param>
     [HttpDelete("{id:guid}")]
-    [ProducesResponseType<ApiResponse<object>>(StatusCodes.Status200OK)]
-    [ProducesResponseType<ApiResponse<object>>(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(
+        Summary = "Cancela um pedido",
+        Description = "Realiza a exclusão lógica do pedido, alterando seu status para Cancelado.",
+        OperationId = "CancelarPedido",
+        Tags = ["Pedidos"])]
+    [SwaggerResponse(
+        StatusCodes.Status200OK,
+        "Pedido cancelado com sucesso.",
+        typeof(ApiResponse<object>))]
+    [SwaggerResponse(
+        StatusCodes.Status404NotFound,
+        "Pedido não encontrado.",
+        typeof(ApiResponse<object>))]
     public async Task<IActionResult> ExcluirAsync(
         Guid id,
         CancellationToken cancellationToken)
