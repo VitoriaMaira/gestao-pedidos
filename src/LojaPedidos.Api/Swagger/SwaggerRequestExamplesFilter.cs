@@ -44,18 +44,23 @@ public sealed class SwaggerRequestExamplesFilter : IOperationFilter
         OpenApiOperation operation,
         OperationFilterContext context)
     {
-        var example = (context.MethodInfo.DeclaringType?.Name, context.MethodInfo.Name) switch
+        (string StatusCode, string Value)? responseExample =
+            (context.MethodInfo.DeclaringType?.Name, context.MethodInfo.Name) switch
         {
-            ("ProdutosController", "ListarAsync") => ListarProdutosResponseExample.Value,
-            ("PedidosController", "ConsultarPorId") => ConsultarPedidoResponseExample.Value,
-            ("PedidosController", "ListarAsync") => ListarPedidosResponseExample.Value,
-            ("PedidosController", "ExcluirAsync") => ExcluirPedidoResponseExample.Value,
-            _ => null
+            ("ProdutosController", "CriarAsync") => ("201", CriarProdutoResponseExample.Value),
+            ("ProdutosController", "ListarAsync") => ("200", ListarProdutosResponseExample.Value),
+            ("PedidosController", "CriarPedidoAsync") => ("201", CriarPedidoResponseExample.Value),
+            ("PedidosController", "ConsultarPorId") => ("200", ConsultarPedidoResponseExample.Value),
+            ("PedidosController", "ListarAsync") => ("200", ListarPedidosResponseExample.Value),
+            ("PedidosController", "AlterarAsync") => ("200", AlterarPedidoResponseExample.Value),
+            ("PedidosController", "AtualizarStatusAsync") => ("200", AtualizarStatusPedidoResponseExample.Value),
+            ("PedidosController", "ExcluirAsync") => ("200", ExcluirPedidoResponseExample.Value),
+            _ => ((string StatusCode, string Value)?)null
         };
 
-        if (example is null ||
+        if (responseExample is null ||
             operation.Responses is null ||
-            !operation.Responses.TryGetValue("200", out var response) ||
+            !operation.Responses.TryGetValue(responseExample.Value.StatusCode, out var response) ||
             response?.Content is null)
         {
             return;
@@ -63,7 +68,7 @@ public sealed class SwaggerRequestExamplesFilter : IOperationFilter
 
         foreach (var mediaType in response.Content.Values)
         {
-            mediaType.Example = JsonNode.Parse(example);
+            mediaType.Example = JsonNode.Parse(responseExample.Value.Value);
         }
     }
 }
