@@ -6,12 +6,20 @@ using LojaPedidos.Domain.Repositories;
 
 namespace LojaPedidos.Application.Pedidos.AlterarPedido;
 
+public interface IAlterarPedidoUseCase
+{
+    Task<ConsultarPedidoResponse> ExecutarAsync(
+        Guid id,
+        AlterarPedidoRequest request,
+        CancellationToken cancellationToken = default);
+}
+
 public sealed class AlterarPedidoUseCase(
     IPedidoRepository pedidoRepository,
     IUnitOfWork unitOfWork,
     IValidator<AlterarPedidoRequest> validator) : IAlterarPedidoUseCase
 {
-    public async Task<PedidoResponse> ExecutarAsync(
+    public async Task<ConsultarPedidoResponse> ExecutarAsync(
         Guid id,
         AlterarPedidoRequest request,
         CancellationToken cancellationToken = default)
@@ -40,6 +48,6 @@ public sealed class AlterarPedidoUseCase(
 
         await unitOfWork.CommitAsync(cancellationToken);
 
-        return PedidoResponse.Criar(pedido);
+        return ConsultarPedidoResponse.Map(pedido);
     }
 }

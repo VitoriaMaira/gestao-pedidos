@@ -1,3 +1,4 @@
+using LojaPedidos.Application.Common.Responses;
 using LojaPedidos.Application.Produtos.Criar;
 using LojaPedidos.Application.Produtos.Listar;
 using Microsoft.AspNetCore.Mvc;
@@ -18,18 +19,20 @@ public sealed class ProdutosController : ControllerBase
     [SwaggerResponse(
         StatusCodes.Status200OK,
         "Produtos listados com sucesso.",
-        typeof(ListarProdutosResponse))]
+        typeof(ApiResponse<ListarProdutosResponse>))]
     [SwaggerResponse(
         StatusCodes.Status400BadRequest,
         "Parâmetros de paginação inválidos.",
-        typeof(ValidationProblemDetails))]
+        typeof(ApiResponse<object>))]
     public async Task<IActionResult> ListarAsync(
         [FromServices] IListarProdutosUseCase useCase,
         [FromQuery] ListarProdutosQuery request,
         CancellationToken cancellationToken)
     {
         var response = await useCase.ExecutarAsync(request, cancellationToken);
-        return Ok(response);
+        return Ok(ApiResponse<ListarProdutosResponse>.Ok(
+            "Produtos listados com sucesso.",
+            response));
     }
 
     [HttpPost]
@@ -42,17 +45,21 @@ public sealed class ProdutosController : ControllerBase
     [SwaggerResponse(
         StatusCodes.Status201Created,
         "Produto criado com sucesso.",
-        typeof(CriarProdutoResponse))]
+        typeof(ApiResponse<CriarProdutoResponse>))]
     [SwaggerResponse(
         StatusCodes.Status400BadRequest,
         "Dados inválidos ou produto com nome já cadastrado.",
-        typeof(ValidationProblemDetails))]
+        typeof(ApiResponse<object>))]
     public async Task<IActionResult> CriarAsync(
         [FromServices] ICriarProdutoUseCase useCase,
         [FromBody] CriarProdutoRequest request,
         CancellationToken cancellationToken)
     {
         var response = await useCase.Execute(request, cancellationToken);
-        return Created($"/api/produtos/{response.Id}", response);
+        return Created(
+            $"/api/produtos/{response.Id}",
+            ApiResponse<CriarProdutoResponse>.Ok(
+                "Produto criado com sucesso.",
+                response));
     }
 }

@@ -10,6 +10,4 @@ public interface IRepositoryBase<TEntity>
     Task AdicionarAsync(TEntity entity, CancellationToken cancellationToken = default);
 
     void Atualizar(TEntity entity);
-
-    void Remover(TEntity entity);
 }

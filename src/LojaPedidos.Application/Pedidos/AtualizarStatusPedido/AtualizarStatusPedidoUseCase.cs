@@ -6,6 +6,14 @@ using LojaPedidos.Domain.Repositories;
 
 namespace LojaPedidos.Application.Pedidos.AtualizarStatusPedido;
 
+public interface IAtualizarStatusPedidoUseCase
+{
+    Task<AtualizarStatusPedidoResponse> ExecutarAsync(
+        Guid id,
+        AtualizarStatusPedidoRequest request,
+        CancellationToken cancellationToken = default);
+}
+
 public sealed class AtualizarStatusPedidoUseCase(
     IPedidoRepository pedidoRepository,
     IUnitOfWork unitOfWork,
@@ -47,7 +55,7 @@ public sealed class AtualizarStatusPedidoUseCase(
 
         return new AtualizarStatusPedidoResponse(
             mensagem,
-            PedidoResponse.Criar(pedido));
+            ConsultarPedidoResponse.Map(pedido));
     }
 
     private static bool TransicaoPermitida(

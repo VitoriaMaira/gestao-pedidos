@@ -181,7 +181,7 @@ public partial class PedidoDetails : IDisposable
     {
         var confirmado = await DialogService.ShowMessageBoxAsync(
             "Excluir pedido",
-            "A exclusão é definitiva. Deseja continuar?",
+            "O pedido será cancelado e permanecerá no histórico. Deseja continuar?",
             yesText: "Excluir",
             cancelText: "Voltar");
 

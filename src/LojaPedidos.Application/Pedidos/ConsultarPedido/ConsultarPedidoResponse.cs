@@ -1,21 +1,21 @@
-using LojaPedidos.Domain.Entities;
+﻿using LojaPedidos.Domain.Entities;
 using LojaPedidos.Domain.Enums;
 
 namespace LojaPedidos.Application.Pedidos.ConsultarPedido;
 
-public sealed record PedidoResponse(
+public sealed record ConsultarPedidoResponse(
     Guid Id,
     Guid CompradorId,
     string Comprador,
     StatusPedido Status,
     decimal Total,
     DateTimeOffset CriadoEm,
-    IReadOnlyCollection<ItemPedidoResponse> Itens)
+    IReadOnlyCollection<ConsultarPedidoResponse_ItemPedido> Itens)
 {
-    public static PedidoResponse Criar(Pedido pedido)
+    public static ConsultarPedidoResponse Map(Pedido pedido)
     {
         var itens = pedido.Itens
-            .Select(item => new ItemPedidoResponse(
+            .Select(item => new ConsultarPedidoResponse_ItemPedido(
                 item.Id,
                 item.ProdutoId,
                 item.Produto.Nome,
@@ -24,7 +24,7 @@ public sealed record PedidoResponse(
                 item.Subtotal))
             .ToArray();
 
-        return new PedidoResponse(
+        return new ConsultarPedidoResponse(
             pedido.Id,
             pedido.CompradorId,
             pedido.Comprador.Nome,
@@ -35,7 +35,7 @@ public sealed record PedidoResponse(
     }
 }
 
-public sealed record ItemPedidoResponse(
+public sealed record ConsultarPedidoResponse_ItemPedido(
     Guid Id,
     Guid ProdutoId,
     string Produto,

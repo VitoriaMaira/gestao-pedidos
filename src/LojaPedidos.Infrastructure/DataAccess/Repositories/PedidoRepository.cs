@@ -9,21 +9,6 @@ namespace LojaPedidos.Infrastructure.DataAccess.Repositories;
 public sealed class PedidoRepository(LojaPedidosDbContext dbContext)
     : RepositoryBase<Pedido>(dbContext), IPedidoRepository
 {
-    public Task<Pedido?> ObterParaExclusaoAsync(
-        Guid id,
-        CancellationToken cancellationToken = default)
-    {
-        return DbSet
-            .Include(pedido => pedido.Itens)
-            .SingleOrDefaultAsync(pedido => pedido.Id == id, cancellationToken);
-    }
-
-    public override void Remover(Pedido pedido)
-    {
-        DbContext.Set<ItemPedido>().RemoveRange(pedido.Itens);
-        base.Remover(pedido);
-    }
-
     public override async Task<Pedido?> ObterPorId(
         Guid id,
         CancellationToken cancellationToken = default)

@@ -22,7 +22,10 @@ public sealed class ListarProdutosTests(AspireAppFixture fixture)
             new ListarProdutosQuery(Pagina: 1, TamanhoPagina: 100));
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        var resultado = Assert.IsType<ListarProdutosResponse>(response.Content);
+        var apiResponse = Assert.IsType<LojaPedidos.Application.Common.Responses.ApiResponse<ListarProdutosResponse>>(
+            response.Content);
+        Assert.True(apiResponse.Sucesso);
+        var resultado = Assert.IsType<ListarProdutosResponse>(apiResponse.Dados);
         Assert.Equal(1, resultado.Pagina);
         Assert.Equal(100, resultado.TamanhoPagina);
         Assert.True(resultado.Total >= 2);
@@ -50,7 +53,7 @@ public sealed class ListarProdutosTests(AspireAppFixture fixture)
             new ListarProdutosQuery(pagina, tamanhoPagina));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        Assert.IsType<Refit.ValidationApiException>(response.Error);
+        Assert.IsType<Refit.ApiException>(response.Error);
     }
 
     private async Task CriarProdutoAsync(string nome, decimal preco)

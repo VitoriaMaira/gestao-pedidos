@@ -1,3 +1,4 @@
+using LojaPedidos.Application.Common.Responses;
 using LojaPedidos.Application.Pedidos.AlterarPedido;
 using LojaPedidos.Application.Pedidos.AtualizarStatusPedido;
 using LojaPedidos.Application.Pedidos.ConsultarPedido;
@@ -12,7 +13,7 @@ namespace LojaPedidos.Api.Controllers;
 [Route("api/pedidos")]
 public sealed class PedidosController(
     ICriarPedidoUseCase criarPedidoUseCase,
-    IObterPedidoPorIdUseCase obterPedidoPorIdUseCase,
+    IConsultarPedidoUseCase consultarPedidoUseCase,
     IListarPedidosUseCase listarPedidosUseCase,
     IAlterarPedidoUseCase alterarPedidoUseCase,
     IAtualizarStatusPedidoUseCase atualizarStatusPedidoUseCase,
@@ -28,8 +29,8 @@ public sealed class PedidosController(
     /// <param name="request">Dados do comprador e dos itens do pedido.</param>
     /// <param name="cancellationToken">Token de cancelamento da requisição.</param>
     [HttpPost]
-    [ProducesResponseType<CriarPedidoResponse>(StatusCodes.Status201Created)]
-    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ApiResponse<CriarPedidoResponse>>(StatusCodes.Status201Created)]
+    [ProducesResponseType<ApiResponse<object>>(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CriarPedidoAsync(
         [FromBody] CriarPedidoRequest request,
         CancellationToken cancellationToken)
@@ -37,9 +38,11 @@ public sealed class PedidosController(
         var response = await criarPedidoUseCase.ExecutarAsync(request, cancellationToken);
 
         return CreatedAtAction(
-            nameof(ObterPorId),
+            nameof(ConsultarPorId),
             new { id = response.Id },
-            response);
+            ApiResponse<CriarPedidoResponse>.Ok(
+                "Pedido criado com sucesso.",
+                response));
     }
 
     /// <summary>
@@ -48,15 +51,17 @@ public sealed class PedidosController(
     /// <param name="id">Identificador do pedido.</param>
     /// <param name="cancellationToken">Token de cancelamento da requisição.</param>
     [HttpGet("{id:guid}")]
-    [ProducesResponseType<PedidoResponse>(StatusCodes.Status200OK)]
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ObterPorId(
+    [ProducesResponseType<ApiResponse<ConsultarPedidoResponse>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ApiResponse<object>>(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ConsultarPorId(
         Guid id,
         CancellationToken cancellationToken)
     {
-        var response = await obterPedidoPorIdUseCase.ExecutarAsync(id, cancellationToken);
+        var response = await consultarPedidoUseCase.Execute(id, cancellationToken);
 
-        return Ok(response);
+        return Ok(ApiResponse<ConsultarPedidoResponse>.Ok(
+            "Pedido consultado com sucesso.",
+            response));
     }
 
     /// <summary>
@@ -68,15 +73,17 @@ public sealed class PedidosController(
     /// <param name="request">Paginação e filtros opcionais da consulta.</param>
     /// <param name="cancellationToken">Token de cancelamento da requisição.</param>
     [HttpGet]
-    [ProducesResponseType<ListarPedidosResponse>(StatusCodes.Status200OK)]
-    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ApiResponse<ListarPedidosResponse>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ApiResponse<object>>(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ListarAsync(
         [FromQuery] ListarPedidosRequest request,
         CancellationToken cancellationToken)
     {
-        var response = await listarPedidosUseCase.ExecutarAsync(request, cancellationToken);
+        var response = await listarPedidosUseCase.Execute(request, cancellationToken);
 
-        return Ok(response);
+        return Ok(ApiResponse<ListarPedidosResponse>.Ok(
+            "Pedidos listados com sucesso.",
+            response));
     }
 
     /// <summary>
@@ -86,9 +93,9 @@ public sealed class PedidosController(
     /// <param name="request">Itens e novas quantidades.</param>
     /// <param name="cancellationToken">Token de cancelamento da requisição.</param>
     [HttpPut("{id:guid}")]
-    [ProducesResponseType<PedidoResponse>(StatusCodes.Status200OK)]
-    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ApiResponse<ConsultarPedidoResponse>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ApiResponse<object>>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ApiResponse<object>>(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> AlterarAsync(
         Guid id,
         [FromBody] AlterarPedidoRequest request,
@@ -99,7 +106,9 @@ public sealed class PedidosController(
             request,
             cancellationToken);
 
-        return Ok(response);
+        return Ok(ApiResponse<ConsultarPedidoResponse>.Ok(
+            "Pedido atualizado com sucesso.",
+            response));
     }
 
     /// <summary>
@@ -113,9 +122,9 @@ public sealed class PedidosController(
     /// <param name="request">Novo status do pedido.</param>
     /// <param name="cancellationToken">Token de cancelamento da requisição.</param>
     [HttpPut("{id:guid}/status")]
-    [ProducesResponseType<AtualizarStatusPedidoResponse>(StatusCodes.Status200OK)]
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ApiResponse<AtualizarStatusPedidoResponse>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ApiResponse<object>>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ApiResponse<object>>(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> AtualizarStatusAsync(
         Guid id,
         [FromBody] AtualizarStatusPedidoRequest request,
@@ -126,27 +135,29 @@ public sealed class PedidosController(
             request,
             cancellationToken);
 
-        return Ok(response);
+        return Ok(ApiResponse<AtualizarStatusPedidoResponse>.Ok(
+            response.Mensagem,
+            response));
     }
 
     /// <summary>
-    /// Exclui definitivamente um pedido.
+    /// Realiza a exclusão lógica de um pedido.
     /// </summary>
     /// <remarks>
-    /// A exclusão é diferente do cancelamento, que deve ser feito pela atualização de status.
+    /// O pedido não é removido do banco de dados; seu status é alterado para Cancelado.
     /// </remarks>
     /// <param name="id">Identificador do pedido.</param>
     /// <param name="cancellationToken">Token de cancelamento da requisição.</param>
     [HttpDelete("{id:guid}")]
-    [ProducesResponseType<ExcluirPedidoResponse>(StatusCodes.Status200OK)]
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ApiResponse<object>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ApiResponse<object>>(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ExcluirAsync(
         Guid id,
         CancellationToken cancellationToken)
     {
-        var response = await excluirPedidoUseCase.ExecutarAsync(id, cancellationToken);
+        await excluirPedidoUseCase.ExecutarAsync(id, cancellationToken);
 
-        return Ok(response);
+        return Ok(ApiResponse<object>.Ok("Pedido cancelado com sucesso."));
     }
 
 }

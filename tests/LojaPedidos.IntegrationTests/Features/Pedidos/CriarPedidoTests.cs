@@ -1,5 +1,6 @@
 using System.Net;
 using LojaPedidos.Application.Pedidos.CriarPedido;
+using LojaPedidos.Application.Pedidos.ConsultarPedido;
 using LojaPedidos.Application.Produtos.Criar;
 using LojaPedidos.IntegrationTests.Configurations;
 
@@ -18,7 +19,10 @@ public sealed class CriarPedidoTests(AspireAppFixture fixture)
         var response = await fixture.Api.Pedidos.CriarAsync(request);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-        var pedido = Assert.IsType<CriarPedidoResponse>(response.Content);
+        var apiResponse = Assert.IsType<LojaPedidos.Application.Common.Responses.ApiResponse<CriarPedidoResponse>>(
+            response.Content);
+        Assert.True(apiResponse.Sucesso);
+        var pedido = Assert.IsType<CriarPedidoResponse>(apiResponse.Dados);
         Assert.NotEqual(Guid.Empty, pedido.Id);
 
         await ExcluirPedidoAsync(pedido.Id);
@@ -42,18 +46,20 @@ public sealed class CriarPedidoTests(AspireAppFixture fixture)
 
         try
         {
-            var primeiraConsulta = await fixture.Api.Pedidos.ObterPorIdAsync(
+            var primeiraConsulta = await fixture.Api.Pedidos.ConsultarAsync(
                 primeiroPedido.Id);
-            var segundaConsulta = await fixture.Api.Pedidos.ObterPorIdAsync(
+            var segundaConsulta = await fixture.Api.Pedidos.ConsultarAsync(
                 segundoPedido.Id);
 
             Assert.Equal(HttpStatusCode.OK, primeiraConsulta.StatusCode);
             Assert.Equal(HttpStatusCode.OK, segundaConsulta.StatusCode);
-            Assert.NotNull(primeiraConsulta.Content);
-            Assert.NotNull(segundaConsulta.Content);
+            var primeiroPedidoConsultado = Assert.IsType<ConsultarPedidoResponse>(
+                primeiraConsulta.Content?.Dados);
+            var segundoPedidoConsultado = Assert.IsType<ConsultarPedidoResponse>(
+                segundaConsulta.Content?.Dados);
             Assert.Equal(
-                primeiraConsulta.Content.CompradorId,
-                segundaConsulta.Content.CompradorId);
+                primeiroPedidoConsultado.CompradorId,
+                segundoPedidoConsultado.CompradorId);
         }
         finally
         {
@@ -95,6 +101,16 @@ public sealed class CriarPedidoTests(AspireAppFixture fixture)
     }
 
     [Fact]
+    public async Task DeveRejeitarPedidoSemItens()
+    {
+        var response = await fixture.Api.Pedidos.CriarAsync(
+            NovoPedido([]));
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.IsType<Refit.ApiException>(response.Error);
+    }
+
+    [Fact]
     public async Task DeveRetornarNotFoundQuandoProdutoNaoExistir()
     {
         var request = NovoPedido(
@@ -113,7 +129,7 @@ public sealed class CriarPedidoTests(AspireAppFixture fixture)
                 79.90m));
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-        return Assert.IsType<CriarProdutoResponse>(response.Content);
+        return Assert.IsType<CriarProdutoResponse>(response.Content?.Dados);
     }
 
     private async Task<CriarPedidoResponse> CriarPedidoAsync(
@@ -122,7 +138,7 @@ public sealed class CriarPedidoTests(AspireAppFixture fixture)
         var response = await fixture.Api.Pedidos.CriarAsync(request);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-        return Assert.IsType<CriarPedidoResponse>(response.Content);
+        return Assert.IsType<CriarPedidoResponse>(response.Content?.Dados);
     }
 
     private async Task ExcluirPedidoAsync(Guid id)

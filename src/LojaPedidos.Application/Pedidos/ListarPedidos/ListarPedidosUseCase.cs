@@ -1,15 +1,19 @@
 using FluentValidation;
-using LojaPedidos.Application.Pedidos.ConsultarPedido;
 using LojaPedidos.Domain.Repositories;
 using LojaPedidos.Domain.ValueObjects;
 
 namespace LojaPedidos.Application.Pedidos.ListarPedidos;
 
+public interface IListarPedidosUseCase
+{
+    Task<ListarPedidosResponse> Execute(ListarPedidosRequest request, CancellationToken cancellationToken = default);
+}
+
 public sealed class ListarPedidosUseCase(
     IPedidoRepository pedidoRepository,
     IValidator<ListarPedidosRequest> validator) : IListarPedidosUseCase
 {
-    public async Task<ListarPedidosResponse> ExecutarAsync(
+    public async Task<ListarPedidosResponse> Execute(
         ListarPedidosRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -26,10 +30,8 @@ public sealed class ListarPedidosUseCase(
             cpf,
             cancellationToken);
 
-        var itens = pedidos.Select(PedidoResponse.Criar).ToArray();
-
-        return new ListarPedidosResponse(
-            itens,
+        return ListarPedidosResponse.Map(
+            pedidos,
             request.Pagina,
             request.TamanhoPagina,
             total);

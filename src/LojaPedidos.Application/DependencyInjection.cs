@@ -17,7 +17,7 @@ public static class DependencyInjection
     {
         services.AddValidatorsFromAssemblyContaining<CriarPedidoRequestValidator>();
         services.AddScoped<ICriarPedidoUseCase, CriarPedidoUseCase>();
-        services.AddScoped<IObterPedidoPorIdUseCase, ObterPedidoPorIdUseCase>();
+        services.AddScoped<IConsultarPedidoUseCase, ConsultarPedidoUseCase>();
         services.AddScoped<IListarPedidosUseCase, ListarPedidosUseCase>();
         services.AddScoped<IAlterarPedidoUseCase, AlterarPedidoUseCase>();
         services.AddScoped<IAtualizarStatusPedidoUseCase, AtualizarStatusPedidoUseCase>();

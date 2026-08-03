@@ -13,14 +13,17 @@ public sealed class CriarProdutoTests(AspireAppFixture fixture)
         var response = await fixture.Api.Produtos.CriarAsync(request);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-        var produto = Assert.IsType<CriarProdutoResponse>(response.Content);
+        var apiResponse = Assert.IsType<LojaPedidos.Application.Common.Responses.ApiResponse<CriarProdutoResponse>>(
+            response.Content);
+        Assert.True(apiResponse.Sucesso);
+        var produto = Assert.IsType<CriarProdutoResponse>(apiResponse.Dados);
         Assert.NotEqual(Guid.Empty, produto.Id);
     }
 
     [Theory]
-    [InlineData("", 10, "Nome")]
-    [InlineData("Produto inválido", 0, "Preco")]
-    [InlineData("Produto inválido", -1, "Preco")]
+    [InlineData("", 10, "nome")]
+    [InlineData("Produto inválido", 0, "preço")]
+    [InlineData("Produto inválido", -1, "preço")]
     public async Task DeveRejeitarProdutoComDadosInvalidos(
         string nome,
         decimal preco,
@@ -30,10 +33,8 @@ public sealed class CriarProdutoTests(AspireAppFixture fixture)
             new CriarProdutoRequest(nome, preco));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        var erro = Assert.IsType<Refit.ValidationApiException>(response.Error);
-        var problema = erro.Content;
-        Assert.NotNull(problema);
-        Assert.Contains(propriedadeInvalida, problema.Errors.Keys);
+        var erro = Assert.IsType<Refit.ApiException>(response.Error);
+        Assert.Contains(propriedadeInvalida, erro.Content, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]

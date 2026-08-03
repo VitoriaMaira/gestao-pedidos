@@ -9,8 +9,6 @@ public class RepositoryBase<TEntity>(LojaPedidosDbContext dbContext)
     : IRepositoryBase<TEntity>
    where TEntity : Entity
 {
-    protected LojaPedidosDbContext DbContext { get; } = dbContext;
-
     protected DbSet<TEntity> DbSet { get; } = dbContext.Set<TEntity>();
 
     public virtual async Task<TEntity?> ObterPorId(
@@ -32,8 +30,4 @@ public class RepositoryBase<TEntity>(LojaPedidosDbContext dbContext)
         DbSet.Update(entity);
     }
 
-    public virtual void Remover(TEntity entity)
-    {
-        DbSet.Remove(entity);
-    }
 }

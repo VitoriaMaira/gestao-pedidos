@@ -61,7 +61,7 @@ public sealed class PedidosApiClient(HttpClient httpClient) : IPedidosApiClient
         Guid id,
         CancellationToken cancellationToken = default) =>
         EnviarAsync<ExcluirPedidoResponse>(HttpMethod.Delete, $"api/pedidos/{id}", null,
-            "Não foi possível excluir o pedido.", cancellationToken);
+            "Não foi possível cancelar o pedido.", cancellationToken);
 
     private async Task<ApiResult<T>> EnviarAsync<T>(
         HttpMethod metodo,
@@ -89,13 +89,17 @@ public sealed class PedidosApiClient(HttpClient httpClient) : IPedidosApiClient
                     cancellationToken);
             }
 
-            var dados = await response.Content.ReadFromJsonAsync<T>(
+            var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse<T>>(
                 JsonOptions,
                 cancellationToken);
 
-            return dados is null
+            return apiResponse is null
                 ? ApiResult<T>.Falha("A API retornou uma resposta vazia.", response.StatusCode)
-                : ApiResult<T>.Ok(dados);
+                : new ApiResult<T>(
+                    apiResponse.Sucesso,
+                    apiResponse.Dados,
+                    apiResponse.Mensagem,
+                    response.StatusCode);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
@@ -150,6 +154,17 @@ public sealed class PedidosApiClient(HttpClient httpClient) : IPedidosApiClient
             if (string.IsNullOrWhiteSpace(conteudo))
             {
                 return ApiResult<T>.Falha(mensagemPadrao, response.StatusCode);
+            }
+
+            var apiResponse = JsonSerializer.Deserialize<ApiResponse<object>>(
+                conteudo,
+                JsonOptions);
+
+            if (apiResponse is not null)
+            {
+                return ApiResult<T>.Falha(
+                    apiResponse.Mensagem,
+                    response.StatusCode);
             }
 
             var problema = JsonSerializer.Deserialize<ApiProblem>(conteudo, JsonOptions);

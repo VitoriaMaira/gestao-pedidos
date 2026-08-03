@@ -7,12 +7,12 @@ namespace LojaPedidos.IntegrationTests.Clients.Produtos;
 public interface IProdutosApi
 {
     [Get("/api/produtos")]
-    Task<ApiResponse<ListarProdutosResponse>> ListarAsync(
+    Task<Refit.ApiResponse<LojaPedidos.Application.Common.Responses.ApiResponse<ListarProdutosResponse>>> ListarAsync(
         [Query] ListarProdutosQuery query,
         CancellationToken cancellationToken = default);
 
     [Post("/api/produtos")]
-    Task<ApiResponse<CriarProdutoResponse>> CriarAsync(
+    Task<Refit.ApiResponse<LojaPedidos.Application.Common.Responses.ApiResponse<CriarProdutoResponse>>> CriarAsync(
         CriarProdutoRequest request,
         CancellationToken cancellationToken = default);
 }

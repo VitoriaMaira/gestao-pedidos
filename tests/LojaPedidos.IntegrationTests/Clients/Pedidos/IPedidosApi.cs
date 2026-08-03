@@ -11,34 +11,34 @@ namespace LojaPedidos.IntegrationTests.Clients.Pedidos;
 public interface IPedidosApi
 {
     [Post("/api/pedidos")]
-    Task<ApiResponse<CriarPedidoResponse>> CriarAsync(
+    Task<Refit.ApiResponse<LojaPedidos.Application.Common.Responses.ApiResponse<CriarPedidoResponse>>> CriarAsync(
         CriarPedidoRequest request,
         CancellationToken cancellationToken = default);
 
     [Get("/api/pedidos/{id}")]
-    Task<ApiResponse<PedidoResponse>> ObterPorIdAsync(
+    Task<Refit.ApiResponse<LojaPedidos.Application.Common.Responses.ApiResponse<ConsultarPedidoResponse>>> ConsultarAsync(
         Guid id,
         CancellationToken cancellationToken = default);
 
     [Get("/api/pedidos")]
-    Task<ApiResponse<ListarPedidosResponse>> ListarAsync(
+    Task<Refit.ApiResponse<LojaPedidos.Application.Common.Responses.ApiResponse<ListarPedidosResponse>>> ListarAsync(
         [Query] ListarPedidosRequest request,
         CancellationToken cancellationToken = default);
 
     [Put("/api/pedidos/{id}")]
-    Task<ApiResponse<PedidoResponse>> AlterarAsync(
+    Task<Refit.ApiResponse<LojaPedidos.Application.Common.Responses.ApiResponse<ConsultarPedidoResponse>>> AlterarAsync(
         Guid id,
         AlterarPedidoRequest request,
         CancellationToken cancellationToken = default);
 
     [Put("/api/pedidos/{id}/status")]
-    Task<ApiResponse<AtualizarStatusPedidoResponse>> AtualizarStatusAsync(
+    Task<Refit.ApiResponse<LojaPedidos.Application.Common.Responses.ApiResponse<AtualizarStatusPedidoResponse>>> AtualizarStatusAsync(
         Guid id,
         AtualizarStatusPedidoRequest request,
         CancellationToken cancellationToken = default);
 
     [Delete("/api/pedidos/{id}")]
-    Task<ApiResponse<ExcluirPedidoResponse>> ExcluirAsync(
+    Task<Refit.ApiResponse<LojaPedidos.Application.Common.Responses.ApiResponse<object>>> ExcluirAsync(
         Guid id,
         CancellationToken cancellationToken = default);
 }
