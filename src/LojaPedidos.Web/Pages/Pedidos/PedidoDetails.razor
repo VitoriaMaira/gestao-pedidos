@@ -121,7 +121,12 @@ else if (_pedido is not null)
                 <MudTh Class="text-right">Subtotal</MudTh>
             </HeaderContent>
             <RowTemplate Context="item">
-                <MudTd DataLabel="Produto" Class="product-name">@item.Produto</MudTd>
+                <MudTd DataLabel="Produto">
+                    <div class="product-cell">
+                        <img src="@ObterImagem(item.ImagemUrl)" alt="" />
+                        <span class="product-name">@item.Produto</span>
+                    </div>
+                </MudTd>
                 <MudTd DataLabel="Item ID"><span class="item-id">@item.Id</span></MudTd>
                 <MudTd DataLabel="Quantidade">
                     @if (_editando)

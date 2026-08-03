@@ -22,5 +22,8 @@ public sealed class ProdutoMapping : IEntityTypeConfiguration<Produto>
         builder.Property(produto => produto.Preco)
             .HasPrecision(18, 2)
             .IsRequired();
+
+        builder.Property(produto => produto.ImagemUrl)
+            .HasMaxLength(2048);
     }
 }

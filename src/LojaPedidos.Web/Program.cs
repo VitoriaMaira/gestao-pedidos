@@ -1,5 +1,6 @@
 ﻿using LojaPedidos.Web;
 using LojaPedidos.Web.Clients.Pedidos;
+using LojaPedidos.Web.Clients.Produtos;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
@@ -19,5 +20,6 @@ builder.Services.AddScoped(_ => new HttpClient
     BaseAddress = new Uri(apiBaseUrl)
 });
 builder.Services.AddScoped<IPedidosApiClient, PedidosApiClient>();
+builder.Services.AddScoped<IProdutosApiClient, ProdutosApiClient>();
 
 await builder.Build().RunAsync();

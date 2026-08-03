@@ -57,6 +57,7 @@ public sealed record ListarPedidosResponse_ItemPedido(
     Guid Id,
     Guid ProdutoId,
     string Produto,
+    string? ImagemUrl,
     int Quantidade,
     decimal PrecoUnitario,
     decimal Subtotal)
@@ -66,6 +67,7 @@ public sealed record ListarPedidosResponse_ItemPedido(
             item.Id,
             item.ProdutoId,
             item.Produto.Nome,
+            item.Produto.ImagemUrl,
             item.Quantidade,
             item.PrecoUnitario,
             item.Subtotal);

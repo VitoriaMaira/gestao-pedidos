@@ -1,13 +1,8 @@
 namespace LojaPedidos.Web.Contracts.Pedidos;
 
 public sealed record CriarPedidoRequest(
-    CriarCompradorRequest Comprador,
+    string NomeComprador,
+    string CpfComprador,
     IReadOnlyCollection<CriarItemPedidoRequest> Itens);
 
-public sealed record CriarCompradorRequest(string Nome, string Cpf);
-
-public sealed record CriarItemPedidoRequest(
-    CriarProdutoRequest Produto,
-    int Quantidade);
-
-public sealed record CriarProdutoRequest(string Nome, decimal Preco);
+public sealed record CriarItemPedidoRequest(Guid Id, int Quantidade);

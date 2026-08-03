@@ -10,6 +10,7 @@ namespace LojaPedidos.Web.Pages.Pedidos;
 
 public partial class PedidoDetails : IDisposable
 {
+    private const string ImagemPadrao = "images/product-placeholder.svg";
     private static readonly CultureInfo CulturaBrasileira = CultureInfo.GetCultureInfo("pt-BR");
     private CancellationTokenSource? _carregamento;
     private PedidoResponse? _pedido;
@@ -53,7 +54,7 @@ public partial class PedidoDetails : IDisposable
 
         try
         {
-            var resultado = await PedidosApiClient.ObterPorIdAsync(Id, carregamentoAtual.Token);
+            var resultado = await PedidosApiClient.ConsultarAsync(Id, carregamentoAtual.Token);
 
             if (!resultado.Sucesso || resultado.Dados is null)
             {
@@ -190,13 +191,16 @@ public partial class PedidoDetails : IDisposable
             return;
         }
 
-        var resultado = await ExecutarAsync(token => PedidosApiClient.ExcluirAsync(Id, token));
-        if (resultado is null)
+        _executando = true;
+        var resultado = await PedidosApiClient.ExcluirAsync(Id);
+        _executando = false;
+        if (!resultado.Sucesso)
         {
+            _mensagemOperacao = resultado.Mensagem ?? "Não foi possível cancelar o pedido.";
             return;
         }
 
-        Snackbar.Add(resultado.Mensagem, Severity.Success);
+        Snackbar.Add(resultado.Mensagem ?? "Pedido cancelado com sucesso.", Severity.Success);
         NavigationManager.NavigateTo("/pedidos");
     }
 
@@ -230,6 +234,9 @@ public partial class PedidoDetails : IDisposable
         data.ToLocalTime().ToString("dd/MM/yyyy 'às' HH:mm", CulturaBrasileira);
 
     private static string FormatarValor(decimal valor) => FormatadorBrasileiro.FormatarMoeda(valor);
+
+    private static string ObterImagem(string? imagemUrl) =>
+        string.IsNullOrWhiteSpace(imagemUrl) ? ImagemPadrao : imagemUrl;
 
     private static string FormatarQuantidade(int quantidade) =>
         quantidade == 1 ? "1 item" : $"{quantidade} itens";

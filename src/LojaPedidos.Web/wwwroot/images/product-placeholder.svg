@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" role="img" aria-labelledby="title description">
+  <title id="title">Produto sem imagem</title>
+  <desc id="description">Ilustração neutra usada quando o produto não possui imagem.</desc>
+  <rect width="640" height="420" fill="#eef2f6"/>
+  <g fill="none" stroke="#8da0b3" stroke-linecap="round" stroke-linejoin="round" stroke-width="18">
+    <path d="M210 155h220l45 65-155 85-155-85 45-65Z"/>
+    <path d="m165 220 155 86 155-86M320 306v72"/>
+    <path d="m255 120 65-36 65 36"/>
+  </g>
+  <text x="320" y="395" fill="#52677c" font-family="Arial, sans-serif" font-size="24" text-anchor="middle">Sem imagem</text>
+</svg>

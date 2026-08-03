@@ -1,4 +1,4 @@
-namespace LojaPedidos.Application.Produtos.Listar;
+namespace LojaPedidos.Web.Contracts.Produtos;
 
 public sealed record ListarProdutosResponse(
     IReadOnlyCollection<ProdutoResponse> Itens,

@@ -46,23 +46,28 @@ public static class DatabaseSeeder
             new ProdutoSeed(
                 Guid.Parse("01980000-0000-7000-8000-000000000001"),
                 "Teclado mecânico",
-                349.90m),
+                349.90m,
+                "https://commons.wikimedia.org/wiki/Special:FilePath/Mechanical%20Keyboard.jpg"),
             new ProdutoSeed(
                 Guid.Parse("01980000-0000-7000-8000-000000000002"),
                 "Mouse sem fio",
-                129.90m),
+                129.90m,
+                "https://commons.wikimedia.org/wiki/Special:FilePath/Wireless%20computer%20mouse.jpg"),
             new ProdutoSeed(
                 Guid.Parse("01980000-0000-7000-8000-000000000003"),
                 "Monitor 24 polegadas",
-                899.90m),
+                899.90m,
+                "https://commons.wikimedia.org/wiki/Special:FilePath/Computer%20monitor.jpg"),
             new ProdutoSeed(
                 Guid.Parse("01980000-0000-7000-8000-000000000004"),
                 "Webcam Full HD",
-                249.90m),
+                249.90m,
+                "https://commons.wikimedia.org/wiki/Special:FilePath/USB%20webcam%20for%20PC.jpg"),
             new ProdutoSeed(
                 Guid.Parse("01980000-0000-7000-8000-000000000005"),
                 "Headset USB",
-                199.90m)
+                199.90m,
+                "https://commons.wikimedia.org/wiki/Special:FilePath/Logitech%20PC%20Headset%20960%20USB%20A-00011%20%2823968868500%29.jpg")
         };
 
         var ids = exemplos.Select(exemplo => exemplo.Id).ToArray();
@@ -80,10 +85,15 @@ public static class DatabaseSeeder
                 {
                     Id = exemplo.Id,
                     Nome = exemplo.Nome,
-                    Preco = exemplo.Preco
+                    Preco = exemplo.Preco,
+                    ImagemUrl = exemplo.ImagemUrl
                 };
 
                 await dbContext.Produtos.AddAsync(produto, cancellationToken);
+            }
+            else if (produto.ImagemUrl != exemplo.ImagemUrl)
+            {
+                produto.ImagemUrl = exemplo.ImagemUrl;
             }
 
             produtos.Add(produto);
@@ -160,7 +170,11 @@ public static class DatabaseSeeder
         return [iniciado, processado, enviado];
     }
 
-    private sealed record ProdutoSeed(Guid Id, string Nome, decimal Preco);
+    private sealed record ProdutoSeed(
+        Guid Id,
+        string Nome,
+        decimal Preco,
+        string ImagemUrl);
 
     private sealed record CompradorSeed(Guid Id, string Nome, string Cpf);
 }

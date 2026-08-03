@@ -29,7 +29,8 @@ public sealed class ListarProdutosUseCase(
             .Select(produto => new ProdutoResponse(
                 produto.Id,
                 produto.Nome,
-                produto.Preco))
+                produto.Preco,
+                produto.ImagemUrl))
             .ToArray();
 
         return new ListarProdutosResponse(

@@ -27,7 +27,10 @@ public class CriarProdutoUseCase(
         var produto = new Produto
         {
             Nome = request.Nome,
-            Preco = request.Preco
+            Preco = request.Preco,
+            ImagemUrl = string.IsNullOrWhiteSpace(request.ImagemUrl)
+                ? null
+                : request.ImagemUrl.Trim()
         };
 
         await produtoRepository.AdicionarAsync(produto, cancellationToken);

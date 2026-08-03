@@ -19,6 +19,7 @@ internal static class ListarPedidosResponseExample
                     "id": "019fbdbf-e925-7260-9976-f61483c85ad8",
                     "produtoId": "019fbdbf-e925-7260-9976-f61483c85ad4",
                     "produto": "Teclado mecânico",
+                    "imagemUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mechanical%20Keyboard.jpg",
                     "quantidade": 2,
                     "precoUnitario": 150.00,
                     "subtotal": 300.00

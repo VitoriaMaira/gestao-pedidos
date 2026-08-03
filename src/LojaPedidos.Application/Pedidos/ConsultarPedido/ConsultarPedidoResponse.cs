@@ -19,6 +19,7 @@ public sealed record ConsultarPedidoResponse(
                 item.Id,
                 item.ProdutoId,
                 item.Produto.Nome,
+                item.Produto.ImagemUrl,
                 item.Quantidade,
                 item.PrecoUnitario,
                 item.Subtotal))
@@ -39,6 +40,7 @@ public sealed record ConsultarPedidoResponse_ItemPedido(
     Guid Id,
     Guid ProdutoId,
     string Produto,
+    string? ImagemUrl,
     int Quantidade,
     decimal PrecoUnitario,
     decimal Subtotal);

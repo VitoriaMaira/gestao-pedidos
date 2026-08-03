@@ -10,12 +10,14 @@ internal static class ListarProdutosResponseExample
               {
                 "id": "019fbdbf-e925-7260-9976-f61483c85ad4",
                 "nome": "Teclado mecânico",
-                "preco": 150.00
+                "preco": 150.00,
+                "imagemUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/Mechanical%20Keyboard.jpg"
               },
               {
                 "id": "019fbdbf-e925-7260-9976-f61483c85ad5",
                 "nome": "Webcam Full HD",
-                "preco": 249.90
+                "preco": 249.90,
+                "imagemUrl": "https://commons.wikimedia.org/wiki/Special:FilePath/USB%20webcam%20for%20PC.jpg"
               }
             ],
             "pagina": 1,

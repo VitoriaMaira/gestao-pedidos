@@ -33,7 +33,7 @@ public sealed class PedidosApiClient(HttpClient httpClient) : IPedidosApiClient
             "Não foi possível consultar os pedidos.",
             cancellationToken);
 
-    public Task<ApiResult<PedidoResponse>> ObterPorIdAsync(
+    public Task<ApiResult<PedidoResponse>> ConsultarAsync(
         Guid id,
         CancellationToken cancellationToken = default) =>
         EnviarAsync<PedidoResponse>(
@@ -57,10 +57,10 @@ public sealed class PedidosApiClient(HttpClient httpClient) : IPedidosApiClient
         EnviarAsync<AtualizarStatusPedidoResponse>(HttpMethod.Put, $"api/pedidos/{id}/status", request,
             "Não foi possível atualizar o status do pedido.", cancellationToken);
 
-    public Task<ApiResult<ExcluirPedidoResponse>> ExcluirAsync(
+    public Task<ApiResult<object>> ExcluirAsync(
         Guid id,
         CancellationToken cancellationToken = default) =>
-        EnviarAsync<ExcluirPedidoResponse>(HttpMethod.Delete, $"api/pedidos/{id}", null,
+        EnviarAsync<object>(HttpMethod.Delete, $"api/pedidos/{id}", null,
             "Não foi possível cancelar o pedido.", cancellationToken);
 
     private async Task<ApiResult<T>> EnviarAsync<T>(

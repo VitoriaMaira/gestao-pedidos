@@ -13,7 +13,7 @@ public interface IPedidosApiClient
         ListarPedidosQuery query,
         CancellationToken cancellationToken = default);
 
-    Task<ApiResult<PedidoResponse>> ObterPorIdAsync(
+    Task<ApiResult<PedidoResponse>> ConsultarAsync(
         Guid id,
         CancellationToken cancellationToken = default);
 
@@ -27,7 +27,7 @@ public interface IPedidosApiClient
         AtualizarStatusPedidoRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<ApiResult<ExcluirPedidoResponse>> ExcluirAsync(
+    Task<ApiResult<object>> ExcluirAsync(
         Guid id,
         CancellationToken cancellationToken = default);
 }
