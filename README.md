@@ -161,12 +161,15 @@ O Aspire cria o SQL Server com volume persistente, inicia a API e o frontend e a
 
 ### Opção 2: Docker Compose
 
-O Compose utiliza a imagem pública `ghcr.io/vitoriamaira/gestao-pedidos-api:latest` e não precisa compilar a API localmente.
+O Compose utiliza a imagem pública:
+API - `ghcr.io/vitoriamaira/loja-pedidos-api:latest` 
+WEB - `ghcr.io/vitoriamaira/loja-pedidos-web:latest`
 
-Crie o arquivo local de configuração:
 
-```powershell
-Copy-Item deploy\.env.example deploy\.env
+Já existe o arquivo local de configuração:
+
+```
+ deploy\.env
 ```
 
 Altere `MSSQL_SA_PASSWORD` em `deploy/.env`. A senha precisa atender aos requisitos do SQL Server. Também é possível mudar `SQLSERVER_PORT` e `API_PORT`; os valores de exemplo são `1433` e `8080`. O arquivo `deploy/.env` contém informação sensível, está ignorado pelo Git e não deve ser enviado ao repositório.

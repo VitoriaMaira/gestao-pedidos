@@ -70,6 +70,13 @@ public partial class PedidoCreate
         await _form.ValidateAsync();
         if (!_formularioValido || _itens.Count == 0 || _itens.Any(item => item.Quantidade <= 0))
         {
+            if (!_formularioValido)
+            {
+                Snackbar.Add(
+                    "Quase lá! Confira os campos destacados e preencha as informações obrigatórias para continuar.",
+                    Severity.Warning);
+            }
+
             _mensagemErro = _itens.Count == 0
                 ? "Selecione pelo menos um produto."
                 : "Revise os campos destacados antes de criar o pedido.";
